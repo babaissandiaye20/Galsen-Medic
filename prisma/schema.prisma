@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Privilege {
+  id           Int           @id @default(autoincrement())
+  libelle      String        @unique
+  utilisateurs Utilisateur[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Utilisateur {
+  id          Int       @id @default(autoincrement())
+  nom         String
+  prenom      String
+  email       String    @unique
+  password    String
+  telephone   String
+  profil      String
+  idPrivilege Int
+  privilege   Privilege @relation(fields: [idPrivilege], references: [id])
+
+  reservations Reservation[]
+  dossiers     DossierMedical[]
+  logs         Log[]
+
+  ordonnancesMedecin Ordonnance[] @relation(name: "MedecinOrdonnance")
+  ordonnancesPatient Ordonnance[] @relation(name: "PatientOrdonnance")
+
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  deletedAt          DateTime?
+  MedecinSousService MedecinSousService[]
+}
+
+model Service {
+  id           Int           @id @default(autoincrement())
+  libelle      String        @unique
+  sousServices SousService[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model SousService {
+  id        Int                  @id @default(autoincrement())
+  libelle   String
+  idService Int
+  service   Service              @relation(fields: [idService], references: [id])
+  medecins  MedecinSousService[]
+  tarifs    Tarif[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model MedecinSousService {
+  id             Int             @id @default(autoincrement())
+  idMedecin      Int
+  idSousService  Int
+  medecin        Utilisateur     @relation(fields: [idMedecin], references: [id])
+  sousService    SousService     @relation(fields: [idSousService], references: [id])
+  disponibilites Disponibilite[]
+  reservations   Reservation[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Disponibilite {
+  id                   Int                @id @default(autoincrement())
+  idMedecinSousService Int
+  jourSemaine          String
+  heureDebut           String
+  heureFin             String
+  medecinSousService   MedecinSousService @relation(fields: [idMedecinSousService], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Devise {
+  id      Int     @id @default(autoincrement())
+  code    String  @unique
+  libelle String
+  symbole String
+  actif   Boolean
+  tarifs  Tarif[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Tarif {
+  id            Int         @id @default(autoincrement())
+  idSousService Int
+  idDevise      Int
+  montant       Float
+  actif         Boolean
+  sousService   SousService @relation(fields: [idSousService], references: [id])
+  devise        Devise      @relation(fields: [idDevise], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model StatutReservation {
+  id           Int           @id @default(autoincrement())
+  libelle      String        @unique
+  reservations Reservation[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Reservation {
+  id                   Int                @id @default(autoincrement())
+  idUtilisateur        Int
+  idMedecinSousService Int
+  idStatutReservation  Int
+  typeConsultation     String // ENUM('physique', 'video')
+  etatPaiement         String
+  utilisateur          Utilisateur        @relation(fields: [idUtilisateur], references: [id])
+  medecinSousService   MedecinSousService @relation(fields: [idMedecinSousService], references: [id])
+  statutReservation    StatutReservation  @relation(fields: [idStatutReservation], references: [id])
+  paiement             Paiement?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model ModePaiement {
+  id        Int        @id @default(autoincrement())
+  libelle   String     @unique
+  icon      String?
+  paiements Paiement[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Paiement {
+  id                   Int          @id @default(autoincrement())
+  idReservation        Int          @unique
+  montant              Float
+  idModePaiement       Int
+  referenceTransaction String
+  etatTransaction      String
+  reservation          Reservation  @relation(fields: [idReservation], references: [id])
+  modePaiement         ModePaiement @relation(fields: [idModePaiement], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Ordonnance {
+  id        Int    @id @default(autoincrement())
+  idPatient Int
+  idMedecin Int
+  contenu   String
+
+  patient Utilisateur @relation(fields: [idPatient], references: [id], name: "PatientOrdonnance")
+  medecin Utilisateur @relation(fields: [idMedecin], references: [id], name: "MedecinOrdonnance")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model DossierMedical {
+  id            Int         @id @default(autoincrement())
+  idPatient     Int
+  historique    String
+  fichiers      String
+  dateMiseAJour DateTime
+  patient       Utilisateur @relation(fields: [idPatient], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Log {
+  id            Int         @id @default(autoincrement())
+  idUtilisateur Int
+  action        String
+  ip            String
+  dateCreation  DateTime    @default(now())
+  utilisateur   Utilisateur @relation(fields: [idUtilisateur], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+generator nestjsDto {
+  provider = "prisma-generator-nestjs-dto"
+  output   = "../src/generated/nestjs-dto"
+}
+
