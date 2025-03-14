@@ -1,26 +1,110 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreatePrivilegeDto } from './dto/create-privilege.dto';
 import { UpdatePrivilegeDto } from './dto/update-privilege.dto';
+import { ResponseService } from '../validation/exception/response/response.service';
 
 @Injectable()
 export class PrivilegeService {
-  create(createPrivilegeDto: CreatePrivilegeDto) {
-    return 'This action adds a new privilege';
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly responseService: ResponseService,
+  ) {}
+
+  async create(createPrivilegeDto: CreatePrivilegeDto) {
+    const existingPrivilege = await this.prisma.privilege.findUnique({
+      where: { libelle: createPrivilegeDto.libelle },
+    });
+
+    if (existingPrivilege) {
+      throw new ConflictException(
+        this.responseService.badRequest(
+          ['Le libellé du privilège doit être unique'],
+          'Validation échouée'
+        )
+      );
+    }
+
+    const privilege = await this.prisma.privilege.create({
+      data: createPrivilegeDto,
+    });
+
+    return this.responseService.created(privilege, 'Privilège créé avec succès');
   }
 
-  findAll() {
-    return `This action returns all privilege`;
+  async findAll() {
+    const privileges = await this.prisma.privilege.findMany({
+      where: { deletedAt: null }, // Exclure les privilèges supprimés
+    });
+
+    return this.responseService.success(privileges, 'Liste des privilèges récupérée');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} privilege`;
+  async findOne(id: number) {
+    const privilege = await this.prisma.privilege.findFirst({
+      where: { id, deletedAt: null }, // Vérifier que l'entrée n'est pas supprimée
+    });
+
+    if (!privilege) {
+      throw new NotFoundException(
+        this.responseService.notFound(`Le privilège #${id} n'existe pas ou a été supprimé`)
+      );
+    }
+
+    return this.responseService.success(privilege, 'Privilège récupéré');
   }
 
-  update(id: number, updatePrivilegeDto: UpdatePrivilegeDto) {
-    return `This action updates a #${id} privilege`;
+  async update(id: number, updatePrivilegeDto: UpdatePrivilegeDto) {
+    const privilege = await this.prisma.privilege.findFirst({
+      where: { id, deletedAt: null },
+    });
+
+    if (!privilege) {
+      throw new NotFoundException(
+        this.responseService.notFound(`Le privilège #${id} n'existe pas ou a été supprimé`)
+      );
+    }
+
+    if (updatePrivilegeDto.libelle) {
+      const existingPrivilege = await this.prisma.privilege.findUnique({
+        where: { libelle: updatePrivilegeDto.libelle },
+      });
+
+      if (existingPrivilege && existingPrivilege.id !== id) {
+        throw new ConflictException(
+          this.responseService.badRequest(
+            ['Le libellé du privilège doit être unique'],
+            'Validation échouée'
+          )
+        );
+      }
+    }
+
+    const updatedPrivilege = await this.prisma.privilege.update({
+      where: { id },
+      data: updatePrivilegeDto,
+    });
+
+    return this.responseService.success(updatedPrivilege, 'Privilège mis à jour avec succès');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} privilege`;
+  async remove(id: number) {
+    const privilege = await this.prisma.privilege.findFirst({
+      where: { id, deletedAt: null },
+    });
+
+    if (!privilege) {
+      throw new NotFoundException(
+        this.responseService.notFound(`Le privilège #${id} n'existe pas ou a déjà été supprimé`)
+      );
+    }
+
+    // Soft delete: on met à jour `deletedAt` au lieu de supprimer
+    await this.prisma.privilege.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    return this.responseService.success(null, 'Privilège supprimé avec succès (soft delete)');
   }
 }
