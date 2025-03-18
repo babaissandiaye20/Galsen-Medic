@@ -36,8 +36,9 @@ password: string ;
 telephone: string ;
 @ApiProperty({
   type: 'string',
+  nullable: true,
 })
-profil: string ;
+profil: string  | null;
 @ApiProperty({
   type: 'integer',
   format: 'int32',

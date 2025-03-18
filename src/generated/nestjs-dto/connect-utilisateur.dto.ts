@@ -16,4 +16,9 @@ id?: number ;
   required: false,
 })
 email?: string ;
+@ApiProperty({
+  type: 'string',
+  required: false,
+})
+telephone?: string ;
 }

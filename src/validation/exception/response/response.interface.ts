@@ -3,6 +3,6 @@ export interface Response<T> {
   message: string;
   data?: T;
   errors?: string[];
-  timestamp: string;
+  timestamp?: string;
   path?: string;
 }

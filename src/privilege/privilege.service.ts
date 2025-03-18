@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePrivilegeDto } from './dto/create-privilege.dto';
 import { UpdatePrivilegeDto } from './dto/update-privilege.dto';
@@ -11,7 +11,25 @@ export class PrivilegeService {
     private readonly responseService: ResponseService,
   ) {}
 
-  async create(createPrivilegeDto: CreatePrivilegeDto) {
+  // ✅ Vérification de l'admin
+  private async verifyAdmin(currentUser: any) {
+    if (!currentUser) {
+      throw new UnauthorizedException("Vous devez être connecté pour effectuer cette action.");
+    }
+
+    const user = await this.prisma.utilisateur.findFirst({
+      where: { id: currentUser.id },
+      include: { privilege: true },
+    });
+
+    if (!user || user.privilege?.libelle !== 'Admin') {
+      throw new UnauthorizedException("Seuls les administrateurs peuvent effectuer cette action.");
+    }
+  }
+
+  async create(createPrivilegeDto: CreatePrivilegeDto, currentUser: any) {
+    await this.verifyAdmin(currentUser); // ✅ Vérification Admin
+
     const existingPrivilege = await this.prisma.privilege.findUnique({
       where: { libelle: createPrivilegeDto.libelle },
     });
@@ -32,17 +50,21 @@ export class PrivilegeService {
     return this.responseService.created(privilege, 'Privilège créé avec succès');
   }
 
-  async findAll() {
+  async findAll(currentUser: any) {
+    await this.verifyAdmin(currentUser); // ✅ Vérification Admin
+
     const privileges = await this.prisma.privilege.findMany({
-      where: { deletedAt: null }, // Exclure les privilèges supprimés
+      where: { deletedAt: null },
     });
 
     return this.responseService.success(privileges, 'Liste des privilèges récupérée');
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, currentUser: any) {
+    await this.verifyAdmin(currentUser); // ✅ Vérification Admin
+
     const privilege = await this.prisma.privilege.findFirst({
-      where: { id, deletedAt: null }, // Vérifier que l'entrée n'est pas supprimée
+      where: { id, deletedAt: null },
     });
 
     if (!privilege) {
@@ -54,7 +76,9 @@ export class PrivilegeService {
     return this.responseService.success(privilege, 'Privilège récupéré');
   }
 
-  async update(id: number, updatePrivilegeDto: UpdatePrivilegeDto) {
+  async update(id: number, updatePrivilegeDto: UpdatePrivilegeDto, currentUser: any) {
+    await this.verifyAdmin(currentUser); // ✅ Vérification Admin
+
     const privilege = await this.prisma.privilege.findFirst({
       where: { id, deletedAt: null },
     });
@@ -88,7 +112,9 @@ export class PrivilegeService {
     return this.responseService.success(updatedPrivilege, 'Privilège mis à jour avec succès');
   }
 
-  async remove(id: number) {
+  async remove(id: number, currentUser: any) {
+    await this.verifyAdmin(currentUser); // ✅ Vérification Admin
+
     const privilege = await this.prisma.privilege.findFirst({
       where: { id, deletedAt: null },
     });
@@ -99,7 +125,6 @@ export class PrivilegeService {
       );
     }
 
-    // Soft delete: on met à jour `deletedAt` au lieu de supprimer
     await this.prisma.privilege.update({
       where: { id },
       data: { deletedAt: new Date() },

@@ -6,11 +6,26 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PrivilegeModule } from './privilege/privilege.module';
 import { ValidationService } from './validation/validation.service';
 import { ValidationModule } from './validation/validation.module';
+import { UtilisateurModule } from './utilisateur/utilisateur.module';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { LogModule } from './log/log.module';
+import { LogListener } from './log-listener/log-listener';
+import { UploadModule } from './upload/upload.module';
+import { ServiceService } from './service/service.service';
+
+import { ServiceModule } from './service/service.module';
+import { SousServiceModule } from './sous-service/sous-service.module';
+import { UploadService } from './upload/upload.service';
 
 
 @Module({
-  imports: [PrismaModule, PrivilegeModule, ValidationModule],
+  imports: [
+    EventEmitterModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule, PrivilegeModule, ValidationModule, UtilisateurModule, AuthModule, LogModule, UploadModule, ServiceModule, SousServiceModule],
   controllers: [AppController],
-  providers: [AppService, PrismaService, ValidationService],
+  providers: [AppService, PrismaService, ValidationService, ServiceService,UploadService],
 })
 export class AppModule {}

@@ -25,8 +25,8 @@ model Utilisateur {
   prenom      String
   email       String    @unique
   password    String
-  telephone   String
-  profil      String
+  telephone   String    @unique
+  profil      String?
   idPrivilege Int
   privilege   Privilege @relation(fields: [idPrivilege], references: [id])
 
@@ -46,6 +46,7 @@ model Utilisateur {
 model Service {
   id           Int           @id @default(autoincrement())
   libelle      String        @unique
+  iconUrl      String? // Ajout champ iconUrl
   sousServices SousService[]
 
   createdAt DateTime  @default(now())
@@ -56,6 +57,7 @@ model Service {
 model SousService {
   id        Int                  @id @default(autoincrement())
   libelle   String
+  iconUrl   String? // Ajout champ iconUrl
   idService Int
   service   Service              @relation(fields: [idService], references: [id])
   medecins  MedecinSousService[]
@@ -211,9 +213,4 @@ model Log {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-}
-
-generator nestjsDto {
-  provider = "prisma-generator-nestjs-dto"
-  output   = "../src/generated/nestjs-dto"
 }

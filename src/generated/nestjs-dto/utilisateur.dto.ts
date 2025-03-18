@@ -30,8 +30,9 @@ password: string ;
 telephone: string ;
 @ApiProperty({
   type: 'string',
+  nullable: true,
 })
-profil: string ;
+profil: string  | null;
 @ApiProperty({
   type: 'string',
   format: 'date-time',
