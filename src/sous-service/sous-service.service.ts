@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../validation/exception/response/response.service';
 import { CreateSousServiceDto } from './dto/create-sous-service.dto';
@@ -20,12 +20,27 @@ export class SousServiceService {
       include: { privilege: true },
     });
     if (!user || user.privilege?.libelle !== 'Admin') {
-      throw new UnauthorizedException("Seuls les administrateurs peuvent créer un sous-service.");
+      this.responseService.forbidden("Seuls les administrateurs peuvent effectuer cette action.");
     }
+
   }
+
 
   async create(createSousServiceDto: CreateSousServiceDto, file?: Express.Multer.File, currentUser?: any) {
     await this.verifyAdmin(currentUser);
+
+    const service = await this.prisma.service.findUnique({ where: { id: createSousServiceDto. idService, deletedAt: null } });
+    if (!service) {
+      throw new NotFoundException(this.responseService.notFound(`Service #${createSousServiceDto. idService} introuvable`));
+    }
+    const existingService = await this.prisma.sousService.findFirst({
+      where: { libelle: createSousServiceDto.libelle, deletedAt: null },
+    });
+
+    if (existingService) {
+      throw new ConflictException(this.responseService.conflict(`Un service avec le libellé "${createSousServiceDto.libelle}" existe déjà.`));
+    }
+
     let iconUrl = createSousServiceDto.iconUrl;
     if (file) {
       const uploadResult = await this.uploadService.uploadSingle(file, 'sous-services-icons');

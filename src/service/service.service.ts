@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../validation/exception/response/response.service';
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -20,12 +20,23 @@ export class ServiceService {
       include: { privilege: true },
     });
     if (!user || user.privilege?.libelle !== 'Admin') {
-      throw new UnauthorizedException("Seuls les administrateurs peuvent créer un service.");
+        this.responseService.forbidden("Seuls les administrateurs peuvent effectuer cette action.");
+
+
     }
   }
 
   async create(createServiceDto: CreateServiceDto, file?: Express.Multer.File, currentUser?: any) {
     await this.verifyAdmin(currentUser);
+    // Vérification si le libellé existe déjà
+    const existingService = await this.prisma.service.findFirst({
+      where: { libelle: createServiceDto.libelle, deletedAt: null },
+    });
+
+    if (existingService) {
+      throw new ConflictException(this.responseService.conflict(`Un service avec le libellé "${createServiceDto.libelle}" existe déjà.`));
+    }
+
     let iconUrl = createServiceDto.iconUrl;
     if (file) {
       const uploadResult = await this.uploadService.uploadSingle(file, 'services-icons');
@@ -42,7 +53,7 @@ export class ServiceService {
 
   async findOne(id: number) {
     const service = await this.prisma.service.findUnique({ where: { id, deletedAt: null } });
-    if (!service) throw new NotFoundException(this.responseService.notFound(`Service #${id} introuvable`));
+    if (!service) throw new ConflictException(this.responseService.conflict(`Service #${id} introuvable`));
     return this.responseService.success(service, 'Service récupéré');
   }
 

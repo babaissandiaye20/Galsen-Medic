@@ -23,7 +23,7 @@ export class PrivilegeService {
     });
 
     if (!user || user.privilege?.libelle !== 'Admin') {
-      throw new UnauthorizedException("Seuls les administrateurs peuvent effectuer cette action.");
+      this.responseService.forbidden("Seuls les administrateurs peuvent effectuer cette action.");
     }
   }
 

@@ -18,14 +18,18 @@ import { ServiceService } from './service/service.service';
 import { ServiceModule } from './service/service.module';
 import { SousServiceModule } from './sous-service/sous-service.module';
 import { UploadService } from './upload/upload.service';
+import { MedecinSousserviceModule } from './medecin-sousservice/medecin-sousservice.module';
+import { DisponibiliteService } from './disponibilite/disponibilite.service';
+import { DisponibiliteController } from './disponibilite/disponibilite.controller';
+import { DisponibiliteModule } from './disponibilite/disponibilite.module';
 
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
-    PrismaModule, PrivilegeModule, ValidationModule, UtilisateurModule, AuthModule, LogModule, UploadModule, ServiceModule, SousServiceModule],
-  controllers: [AppController],
-  providers: [AppService, PrismaService, ValidationService, ServiceService,UploadService],
+    PrismaModule, PrivilegeModule, ValidationModule, UtilisateurModule, AuthModule, LogModule, UploadModule, ServiceModule, SousServiceModule, MedecinSousserviceModule, DisponibiliteModule],
+  controllers: [AppController, DisponibiliteController],
+  providers: [AppService, PrismaService, ValidationService, ServiceService,UploadService, DisponibiliteService],
 })
 export class AppModule {}

@@ -83,15 +83,21 @@ model MedecinSousService {
 }
 
 model Disponibilite {
-  id                   Int                @id @default(autoincrement())
+  id                   Int       @id @default(autoincrement())
   idMedecinSousService Int
   jourSemaine          String
   heureDebut           String
   heureFin             String
-  medecinSousService   MedecinSousService @relation(fields: [idMedecinSousService], references: [id])
+  pauseDebut           String?
+  pauseFin             String?
+  semaine              Int // Numéro de la semaine pour répéter ou modifier les disponibilités
+  active               Boolean   @default(true) // Si la dispo est toujours valide
+  dateModification     DateTime? // Date de la dernière modification
+
+  medecinSousService MedecinSousService @relation(fields: [idMedecinSousService], references: [id])
 
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime  @default(now())
   deletedAt DateTime?
 }
 
@@ -139,6 +145,8 @@ model Reservation {
   idStatutReservation  Int
   typeConsultation     String // ENUM('physique', 'video')
   etatPaiement         String
+  heureDebut           String // ⬅️ Ajouté
+  heureFin             String // ⬅️ Ajouté
   utilisateur          Utilisateur        @relation(fields: [idUtilisateur], references: [id])
   medecinSousService   MedecinSousService @relation(fields: [idMedecinSousService], references: [id])
   statutReservation    StatutReservation  @relation(fields: [idStatutReservation], references: [id])

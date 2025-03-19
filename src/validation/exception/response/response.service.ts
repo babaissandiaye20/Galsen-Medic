@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {Response} from './response.interface';
+import { Response } from './response.interface';
 
 @Injectable()
 export class ResponseService {
@@ -21,7 +21,6 @@ export class ResponseService {
     };
   }
 
-  // Ajout du type void pour les méthodes qui ne retournent pas de données
   badRequest(errors: string[], message = 'Requête invalide'): Response<void> {
     return {
       statusCode: 400,
@@ -35,7 +34,6 @@ export class ResponseService {
     return {
       statusCode: 403,
       message,
-
       timestamp: new Date().toISOString(),
     };
   }
@@ -51,6 +49,14 @@ export class ResponseService {
   internalError(message = 'Erreur interne du serveur'): Response<void> {
     return {
       statusCode: 500,
+      message,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  conflict(message = 'Conflit détecté'): Response<void> {
+    return {
+      statusCode: 409,
       message,
       timestamp: new Date().toISOString(),
     };
