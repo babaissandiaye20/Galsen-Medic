@@ -1,9 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { UploadService } from './upload.service';
 
+@Global() // 👈 Ajoute ça ici
 @Module({
   providers: [
+    UploadService,
+    CloudinaryService,
     {
       provide: 'UploadService',
       useClass: process.env.STORAGE_SERVICE === 'local'
@@ -11,6 +14,6 @@ import { UploadService } from './upload.service';
         : CloudinaryService,
     },
   ],
-  exports: ['UploadService'], // Export sous forme de token
+  exports: ['UploadService'],
 })
 export class UploadModule {}

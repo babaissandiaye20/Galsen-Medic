@@ -10,9 +10,13 @@ export interface FileStorageService {
     file: Express.Multer.File,
     folder?: string,
   ): Promise<FileUploadResult>;
+
   uploadMultiple(
     files: Express.Multer.File[],
     folder?: string,
   ): Promise<FileUploadResult[]>;
+
+  deleteFile(filePath: string): Promise<void>;
 }
+
 export const DATABASE_CONNECTION = 'UPLOAD';

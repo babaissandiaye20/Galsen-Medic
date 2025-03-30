@@ -20,16 +20,16 @@ model Privilege {
 }
 
 model Utilisateur {
-  id          Int       @id @default(autoincrement())
-  nom         String
-  prenom      String
-  email       String    @unique
-  password    String
-  telephone   String    @unique
-  profil      String?
-  idPrivilege Int
-  privilege   Privilege @relation(fields: [idPrivilege], references: [id])
-
+  id           Int              @id @default(autoincrement())
+  nom          String
+  prenom       String
+  email        String           @unique
+  password     String
+  telephone    String           @unique
+  profil       String?
+  idPrivilege  Int
+  privilege    Privilege        @relation(fields: [idPrivilege], references: [id])
+  profilUrl    String?
   reservations Reservation[]
   dossiers     DossierMedical[]
   logs         Log[]
@@ -173,7 +173,9 @@ model Paiement {
   idReservation        Int          @unique
   montant              Float
   idModePaiement       Int
-  referenceTransaction String
+  referenceTransaction String?
+  qrCodeUrl            String? // URL du QR Code généré
+  paiementUrl          String? // URL de redirection (deep link) vers Wave/OM
   etatTransaction      String
   reservation          Reservation  @relation(fields: [idReservation], references: [id])
   modePaiement         ModePaiement @relation(fields: [idModePaiement], references: [id])

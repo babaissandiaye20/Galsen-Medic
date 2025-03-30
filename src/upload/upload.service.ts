@@ -70,4 +70,14 @@ export class UploadService implements FileStorageService {
       throw error;
     }
   }
+  async deleteFile(filePath: string): Promise<void> {
+    const fullPath = path.join(this.baseDir, filePath);
+    try {
+      await fs.unlink(fullPath);
+      this.logger.log(`🗑️ Fichier supprimé : ${filePath}`);
+    } catch (error) {
+      this.logger.warn(`⚠️ Impossible de supprimer le fichier : ${filePath}`);
+    }
+  }
+
 }

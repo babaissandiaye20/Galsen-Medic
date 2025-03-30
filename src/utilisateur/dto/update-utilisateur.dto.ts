@@ -1,34 +1,63 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateUtilisateurDto } from './create-utilisateur.dto';
-import { IsOptional, IsString, IsEmail, MinLength, Matches, IsInt } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsOptional,
+  IsString,
+  IsEmail,
+  MinLength,
+  Matches,
+  IsInt,
+  ValidateIf,
+} from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class UpdateUtilisateurDto extends PartialType(CreateUtilisateurDto) {
-  @ApiProperty({ example: 'newemail@example.com', description: 'Nouvel email (optionnel)' })
+export class UpdateUtilisateurDto {
+  @ApiPropertyOptional({ example: 'John' })
+  @ValidateIf(o => o.prenom !== '')
   @IsOptional()
-  @IsEmail({}, { message: 'L\'email n\'est pas valide' })
+  @IsString()
+  prenom?: string;
+
+  @ApiPropertyOptional({ example: 'Doe' })
+  @ValidateIf(o => o.nom !== '')
+  @IsOptional()
+  @IsString()
+  nom?: string;
+
+  @ApiPropertyOptional({ example: 'john@example.com' })
+  @ValidateIf(o => o.email !== '')
+  @IsOptional()
+  @IsEmail({}, { message: "L'email n'est pas valide" })
   email?: string;
 
-  @ApiProperty({ example: 'NewPassword123!', description: 'Nouveau mot de passe (optionnel)' })
+  @ApiPropertyOptional({ example: 'NewPassword123!' })
+  @ValidateIf(o => o.password !== '')
   @IsOptional()
   @MinLength(8, { message: 'Le mot de passe doit contenir au moins 8 caractères' })
-  @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
-    message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial',
+  @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/, {
+    message: 'Mot de passe trop faible',
   })
   password?: string;
 
-  @ApiProperty({ example: '+33612345678', description: 'Nouveau numéro de téléphone (optionnel)' })
+  @ApiPropertyOptional({ example: '+221786360662' })
+  @ValidateIf(o => o.telephone !== '')
   @IsOptional()
-  @Matches(/^(\+?\d{10,15})$/, { message: 'Le numéro de téléphone n\'est pas valide' })
+  @Matches(/^\+?\d{9,15}$/, {
+    message: "Le numéro de téléphone doit commencer par + et contenir entre 9 et 15 chiffres",
+  })
   telephone?: string;
 
-  @ApiProperty({ example: 'admin', description: 'Nouveau profil utilisateur (optionnel)' })
+  @ApiPropertyOptional({ example: 'Admin' })
+  @ValidateIf(o => o.profil !== '')
   @IsOptional()
-  @IsString({ message: 'Le profil doit être une chaîne de caractères' })
+  @IsString()
   profil?: string;
 
-  @ApiProperty({ example: 2, description: 'Nouvel ID de privilège (optionnel)' })
+  @ApiPropertyOptional({ example: 2 })
+  @ValidateIf(o => o.idPrivilege !== '')
   @IsOptional()
-  @IsInt({ message: 'L\'ID du privilège doit être un nombre entier' })
+  @IsInt()
   idPrivilege?: number;
+
+  @ApiPropertyOptional({ type: 'string', format: 'binary' }) // ✅ pour Swagger
+  @IsOptional() // ✅ pour éviter une erreur si non envoyé
+  profilUrl?: any; // ✅ surtout pas @IsString()
 }

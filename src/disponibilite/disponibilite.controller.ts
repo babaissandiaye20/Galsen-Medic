@@ -23,6 +23,7 @@ export class DisponibiliteController {
     return this.disponibiliteService.findAll();
   }
 
+
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une disponibilité par ID' })
   findById(@Param('id') id: string) {

@@ -70,4 +70,13 @@ export class CloudinaryService implements FileStorageService {
       throw new Error(`Échec de l'upload des images: ${error.message}`);
     }
   }
+  async deleteFile(fileId: string): Promise<void> {
+    try {
+      await cloudinary.uploader.destroy(fileId);
+      this.logger.log(`🗑️ Image supprimée de Cloudinary : ${fileId}`);
+    } catch (error) {
+      this.logger.warn(`⚠️ Erreur suppression Cloudinary : ${fileId}`);
+    }
+  }
+
 }

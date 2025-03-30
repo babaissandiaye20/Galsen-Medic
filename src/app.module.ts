@@ -22,14 +22,23 @@ import { MedecinSousserviceModule } from './medecin-sousservice/medecin-sousserv
 import { DisponibiliteService } from './disponibilite/disponibilite.service';
 import { DisponibiliteController } from './disponibilite/disponibilite.controller';
 import { DisponibiliteModule } from './disponibilite/disponibilite.module';
+import { DeviseService } from './devise/devise.service';
+import { DeviseController } from './devise/devise.controller';
+import { TarifController } from './tarif/tarif.controller';
+import { TarifService } from './tarif/tarif.service';
+import { TarifModule } from './tarif/tarif.module';
+import { StatutReservationService } from './statut-reservation/statut-reservation.service';
+import { StatutReservationController } from './statut-reservation/statut-reservation.controller';
+import { StatutReservationModule } from './statut-reservation/statut-reservation.module';
+import { ModePaiementModule } from './mode-paiement/mode-paiement.module';
 
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
-    PrismaModule, PrivilegeModule, ValidationModule, UtilisateurModule, AuthModule, LogModule, UploadModule, ServiceModule, SousServiceModule, MedecinSousserviceModule, DisponibiliteModule],
-  controllers: [AppController, DisponibiliteController],
-  providers: [AppService, PrismaService, ValidationService, ServiceService,UploadService, DisponibiliteService],
+    PrismaModule, PrivilegeModule, ValidationModule, UtilisateurModule, AuthModule, LogModule, UploadModule, ServiceModule, SousServiceModule, MedecinSousserviceModule, DisponibiliteModule, TarifModule, StatutReservationModule, ModePaiementModule],
+  controllers: [AppController, DisponibiliteController, DeviseController, TarifController, StatutReservationController],
+  providers: [AppService, PrismaService, ValidationService, ServiceService,UploadService, DisponibiliteService, DeviseService, TarifService, StatutReservationService],
 })
 export class AppModule {}

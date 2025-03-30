@@ -70,4 +70,18 @@ export class SousServiceService {
     await this.prisma.sousService.update({ where: { id }, data: { deletedAt: new Date() } });
     return this.responseService.success(null, 'Sous-service supprimé (soft delete)');
   }
+  async findByServiceId(idService: number) {
+    const sousServices = await this.prisma.sousService.findMany({
+      where: {
+        idService,
+        deletedAt: null,
+      },
+    });
+
+    return this.responseService.success(
+      sousServices,
+      `Sous-services du service #${idService} récupérés avec succès.`,
+    );
+  }
+
 }

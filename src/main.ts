@@ -43,8 +43,13 @@ async function bootstrap() {
   // main.ts (global interceptor)
   app.useGlobalInterceptors(new AsyncContextInterceptor());
 
+  app.enableCors({
+    origin: '*', // ← pour tests. En prod, remplace par les vraies URLs (ex: ['http://localhost:35859'])
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true,
+  });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000,'0.0.0.0');
 }
 
 bootstrap();

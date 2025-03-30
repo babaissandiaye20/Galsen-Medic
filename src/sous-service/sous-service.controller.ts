@@ -28,7 +28,7 @@ export class SousServiceController {
 
   @Get('by-service/:idService')
   findByServiceId(@Param('idService') idService: string) {
-    return this.sousServiceService.findOne(+idService);
+    return this.sousServiceService.findByServiceId((+idService));
   }
 
   @Patch(':id')
@@ -42,4 +42,6 @@ export class SousServiceController {
   remove(@Param('id') id: string) {
     return this.sousServiceService.remove(+id);
   }
+
+
 }

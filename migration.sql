@@ -21,6 +21,7 @@ CREATE TABLE `Utilisateur` (
     `telephone` VARCHAR(191) NOT NULL,
     `profil` VARCHAR(191) NULL,
     `idPrivilege` INTEGER NOT NULL,
+    `profilUrl` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
@@ -34,6 +35,7 @@ CREATE TABLE `Utilisateur` (
 CREATE TABLE `Service` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `libelle` VARCHAR(191) NOT NULL,
+    `iconUrl` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
@@ -46,6 +48,7 @@ CREATE TABLE `Service` (
 CREATE TABLE `SousService` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `libelle` VARCHAR(191) NOT NULL,
+    `iconUrl` VARCHAR(191) NULL,
     `idService` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -73,8 +76,13 @@ CREATE TABLE `Disponibilite` (
     `jourSemaine` VARCHAR(191) NOT NULL,
     `heureDebut` VARCHAR(191) NOT NULL,
     `heureFin` VARCHAR(191) NOT NULL,
+    `pauseDebut` VARCHAR(191) NULL,
+    `pauseFin` VARCHAR(191) NULL,
+    `semaine` INTEGER NOT NULL,
+    `active` BOOLEAN NOT NULL DEFAULT true,
+    `dateModification` DATETIME(3) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `deletedAt` DATETIME(3) NULL,
 
     PRIMARY KEY (`id`)
@@ -129,6 +137,8 @@ CREATE TABLE `Reservation` (
     `idStatutReservation` INTEGER NOT NULL,
     `typeConsultation` VARCHAR(191) NOT NULL,
     `etatPaiement` VARCHAR(191) NOT NULL,
+    `heureDebut` VARCHAR(191) NOT NULL,
+    `heureFin` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
@@ -155,7 +165,9 @@ CREATE TABLE `Paiement` (
     `idReservation` INTEGER NOT NULL,
     `montant` DOUBLE NOT NULL,
     `idModePaiement` INTEGER NOT NULL,
-    `referenceTransaction` VARCHAR(191) NOT NULL,
+    `referenceTransaction` VARCHAR(191) NULL,
+    `qrCodeUrl` VARCHAR(191) NULL,
+    `paiementUrl` VARCHAR(191) NULL,
     `etatTransaction` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -253,3 +265,4 @@ ALTER TABLE `DossierMedical` ADD CONSTRAINT `DossierMedical_idPatient_fkey` FORE
 
 -- AddForeignKey
 ALTER TABLE `Log` ADD CONSTRAINT `Log_idUtilisateur_fkey` FOREIGN KEY (`idUtilisateur`) REFERENCES `Utilisateur`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+

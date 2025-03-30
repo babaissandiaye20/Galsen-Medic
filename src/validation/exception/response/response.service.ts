@@ -61,4 +61,15 @@ export class ResponseService {
       timestamp: new Date().toISOString(),
     };
   }
+
+
+  error(message = 'Erreur interne du serveur'): Response<void> {
+    return {
+      statusCode: 500,
+      message,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+
 }

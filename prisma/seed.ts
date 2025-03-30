@@ -4,54 +4,59 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('🌱 Seeding base...');
 
-  // Vérifier si un admin existe déjà
-  const existingAdmin = await prisma.utilisateur.findFirst({
-    where: { email: 'babaissandiaye242@gmail.com' },
+  // 1. Créer les privilèges de base
+  const privileges = ['Admin', 'Client', 'Médecin'];
+
+  for (const libelle of privileges) {
+    const exists = await prisma.privilege.findUnique({ where: { libelle } });
+    if (!exists) {
+      await prisma.privilege.create({ data: { libelle } });
+      console.log(`✅ Privilège "${libelle}" créé`);
+    } else {
+      console.log(`ℹ️ Privilège "${libelle}" déjà existant`);
+    }
+  }
+
+  // 2. Créer un admin par défaut s'il n'existe pas
+  const adminEmail = 'babaissandiaye242@gmail.com';
+
+  const existingAdmin = await prisma.utilisateur.findUnique({
+    where: { email: adminEmail },
   });
 
   if (existingAdmin) {
-    console.log('✅ Admin déjà existant, aucun seed nécessaire.');
+    console.log('✅ Admin déjà existant, rien à faire.');
     return;
   }
 
-  // Trouver le privilège "Admin"
-  let adminPrivilege = await prisma.privilege.findFirst({
-    where: { libelle: 'Admin' },
-  });
+  const adminPrivilege = await prisma.privilege.findUnique({ where: { libelle: 'Admin' } });
 
   if (!adminPrivilege) {
-    // Créer le privilège "Admin" s'il n'existe pas
-    adminPrivilege = await prisma.privilege.create({
-      data: {
-        libelle: 'Admin',
-      },
-    });
+    throw new Error('❌ Le privilège "Admin" est introuvable.');
   }
 
-  // Hasher le mot de passe
   const hashedPassword = await bcrypt.hash('password123', 10);
 
-  // Créer l'utilisateur admin
   const adminUser = await prisma.utilisateur.create({
     data: {
       nom: 'Ndiaye',
       prenom: 'Baba Issa',
-      email: 'babaissandiaye242@gmail.com',
+      email: adminEmail,
       password: hashedPassword,
-      telephone: '+221786360662', // Remplace avec un vrai numéro
-      idPrivilege: adminPrivilege.id, // Associe l'admin à son privilège
+      telephone: '+221786360662',
+      idPrivilege: adminPrivilege.id,
       profil: 'Admin',
     },
   });
 
-  console.log('✅ Admin créé avec succès:', adminUser);
+  console.log('✅ Utilisateur admin créé avec succès:', adminUser.email);
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Erreur lors du seeding:', e);
+    console.error('❌ Erreur lors du seed:', e);
     process.exit(1);
   })
   .finally(async () => {
