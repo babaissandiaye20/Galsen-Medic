@@ -9,18 +9,12 @@ import { ApiTags, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 export class TarifController {
   constructor(private readonly tarifService: TarifService) {}
 
-  /**
-   * ✅ Créer un tarif
-   */
   @Post()
   @ApiOperation({ summary: 'Créer un tarif' })
   create(@Body() dto: CreateTarifDto) {
     return this.tarifService.create(dto);
   }
 
-  /**
-   * ✅ Récupérer tous les tarifs
-   */
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les tarifs' })
   @ApiQuery({ name: 'idSousService', required: false, type: Number })
@@ -31,9 +25,13 @@ export class TarifController {
     return this.tarifService.findAll();
   }
 
-  /**
-   * ✅ Récupérer un tarif par ID
-   */
+  @Get('sous-service/:id/full')
+  @ApiOperation({ summary: 'Lister tous les tarifs (actifs + inactifs) d’un sous-service' })
+  @ApiParam({ name: 'id', type: 'number' })
+  findAllTarifsOfSousService(@Param('id') id: string) {
+    return this.tarifService.findAllBySousServiceFull(+id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer un tarif par ID' })
   @ApiParam({ name: 'id', type: 'number' })
@@ -41,9 +39,6 @@ export class TarifController {
     return this.tarifService.findById(+id);
   }
 
-  /**
-   * ✅ Mettre à jour un tarif
-   */
   @Patch(':id')
   @ApiOperation({ summary: 'Mettre à jour un tarif' })
   @ApiParam({ name: 'id', type: 'number' })
@@ -51,9 +46,6 @@ export class TarifController {
     return this.tarifService.update(+id, dto);
   }
 
-  /**
-   * ✅ Activer un tarif et désactiver les autres pour le même sous-service
-   */
   @Patch(':id/activate')
   @ApiOperation({ summary: 'Activer un tarif et désactiver les autres pour le même sous-service' })
   @ApiParam({ name: 'id', type: 'number' })
@@ -61,14 +53,17 @@ export class TarifController {
     return this.tarifService.activate(+id);
   }
 
-  /**
-   * ✅ Supprimer un tarif (soft delete)
-   */
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un tarif' })
   @ApiParam({ name: 'id', type: 'number' })
   delete(@Param('id') id: string) {
     return this.tarifService.delete(+id);
+  }
+  @Patch(':id/deactivate')
+  @ApiOperation({ summary: 'Désactiver un tarif manuellement' })
+  @ApiParam({ name: 'id', type: 'number' })
+  deactivate(@Param('id') id: string) {
+    return this.tarifService.deactivate(+id);
   }
 
 }

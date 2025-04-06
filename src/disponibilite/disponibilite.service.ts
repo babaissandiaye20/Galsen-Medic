@@ -157,7 +157,6 @@ export class DisponibiliteService {
    * ✅ Récupérer toutes les disponibilités d'un médecin spécifique
    */
   async findDisponibilitesByMedecin(idMedecin: number) {
-    // Vérifier si le médecin existe
     const medecin = await this.prisma.utilisateur.findUnique({
       where: { id: idMedecin },
       include: { MedecinSousService: true },
@@ -169,7 +168,6 @@ export class DisponibiliteService {
       );
     }
 
-    // Récupérer les disponibilités du médecin
     const disponibilites = await this.prisma.disponibilite.findMany({
       where: {
         idMedecinSousService: {
@@ -180,8 +178,24 @@ export class DisponibiliteService {
       orderBy: { jourSemaine: 'asc' },
     });
 
+    // ✅ Ajouter les horaires disponibles à chaque disponibilité
+    const withCreneaux = await Promise.all(disponibilites.map(async (dispo) => {
+      const reservations = await this.prisma.reservation.findMany({
+        where: { idMedecinSousService: dispo.idMedecinSousService },
+        select: { heureDebut: true, heureFin: true },
+      });
+
+      const reservationsSet = new Set(reservations.map(r => `${r.heureDebut}-${r.heureFin}`));
+      const horairesDisponibles = this.genererCreneauxDisponibles(dispo, reservationsSet);
+
+      return {
+        ...dispo,
+        horairesDisponibles,
+      };
+    }));
+
     return this.responseService.success(
-      disponibilites,
+      withCreneaux,
       `Disponibilités du médecin #${idMedecin} récupérées`
     );
   }

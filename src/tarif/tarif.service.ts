@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../validation/exception/response/response.service';
 import { CreateTarifDto } from './dto/create-tarif.dto';
@@ -11,12 +11,8 @@ export class TarifService {
     private readonly responseService: ResponseService,
   ) {}
 
-  /**
-   * ✅ Créer un tarif et désactiver les autres tarifs pour ce sous-service et cette devise
-   */
   async create(createTarifDto: CreateTarifDto) {
     try {
-      // Vérifier si le sous-service existe
       const sousService = await this.prisma.sousService.findUnique({
         where: { id: createTarifDto.idSousService },
       });
@@ -25,7 +21,6 @@ export class TarifService {
         return this.responseService.badRequest([`Sous-service #${createTarifDto.idSousService} non trouvé.`]);
       }
 
-      // Vérifier si la devise existe
       const devise = await this.prisma.devise.findUnique({
         where: { id: createTarifDto.idDevise },
       });
@@ -33,21 +28,23 @@ export class TarifService {
       if (!devise) {
         return this.responseService.badRequest([`Devise #${createTarifDto.idDevise} non trouvée.`]);
       }
-      const existingMontant = await this.prisma.tarif.findFirst({
+
+      const existingTarif = await this.prisma.tarif.findFirst({
         where: {
           idSousService: createTarifDto.idSousService,
+          idDevise: createTarifDto.idDevise,
           montant: createTarifDto.montant,
           deletedAt: null,
         },
       });
 
-      if (existingMontant) {
+      if (existingTarif) {
         return this.responseService.badRequest([
-          `Le montant ${createTarifDto.montant} existe déjà pour ce sous-service.`,
+          `Un tarif avec le montant ${createTarifDto.montant} existe déjà pour ce sous-service et cette devise.`,
         ]);
       }
+
       return await this.prisma.$transaction(async (prisma) => {
-        // Si le nouveau tarif est actif, désactiver les autres tarifs pour ce sous-service et cette devise
         if (createTarifDto.actif) {
           await prisma.tarif.updateMany({
             where: {
@@ -59,13 +56,12 @@ export class TarifService {
           });
         }
 
-        // Créer le nouveau tarif
         const tarif = await prisma.tarif.create({
           data: {
             idSousService: createTarifDto.idSousService,
             idDevise: createTarifDto.idDevise,
             montant: createTarifDto.montant,
-            actif: createTarifDto.actif ?? true, // Actif par défaut
+            actif: createTarifDto.actif ?? true,
           },
           include: {
             sousService: true,
@@ -80,9 +76,6 @@ export class TarifService {
     }
   }
 
-  /**
-   * ✅ Récupérer tous les tarifs
-   */
   async findAll() {
     try {
       const tarifs = await this.prisma.tarif.findMany({
@@ -97,9 +90,6 @@ export class TarifService {
     }
   }
 
-  /**
-   * ✅ Récupérer tous les tarifs actifs pour un sous-service
-   */
   async findAllBySousService(idSousService: number) {
     try {
       const sousService = await this.prisma.sousService.findUnique({
@@ -126,9 +116,32 @@ export class TarifService {
     }
   }
 
-  /**
-   * ✅ Récupérer un tarif par ID
-   */
+  async findAllBySousServiceFull(idSousService: number) {
+    try {
+      const sousService = await this.prisma.sousService.findUnique({
+        where: { id: idSousService },
+      });
+
+      if (!sousService) {
+        return this.responseService.badRequest([`Sous-service #${idSousService} non trouvé.`]);
+      }
+
+      const tarifs = await this.prisma.tarif.findMany({
+        where: {
+          idSousService,
+          deletedAt: null,
+        },
+        include: {
+          devise: true,
+        },
+      });
+
+      return this.responseService.success(tarifs, `Tous les tarifs (actifs et inactifs) pour le sous-service #${idSousService}`);
+    } catch (error) {
+      return this.responseService.error(error.message);
+    }
+  }
+
   async findById(id: number) {
     try {
       const tarif = await this.prisma.tarif.findUnique({
@@ -149,9 +162,6 @@ export class TarifService {
     }
   }
 
-  /**
-   * ✅ Mettre à jour un tarif
-   */
   async update(id: number, updateTarifDto: UpdateTarifDto) {
     try {
       const tarifExisting = await this.prisma.tarif.findUnique({
@@ -162,30 +172,7 @@ export class TarifService {
         return this.responseService.notFound(`Tarif #${id} non trouvé.`);
       }
 
-      // Si on change le sous-service, vérifions qu'il existe
-      if (updateTarifDto.idSousService) {
-        const sousService = await this.prisma.sousService.findUnique({
-          where: { id: updateTarifDto.idSousService },
-        });
-
-        if (!sousService) {
-          return this.responseService.badRequest([`Sous-service #${updateTarifDto.idSousService} non trouvé.`]);
-        }
-      }
-
-      // Si on change la devise, vérifions qu'elle existe
-      if (updateTarifDto.idDevise) {
-        const devise = await this.prisma.devise.findUnique({
-          where: { id: updateTarifDto.idDevise },
-        });
-
-        if (!devise) {
-          return this.responseService.badRequest([`Devise #${updateTarifDto.idDevise} non trouvée.`]);
-        }
-      }
-
       return await this.prisma.$transaction(async (prisma) => {
-        // Si on active ce tarif, désactiver les autres pour le même sous-service et devise
         if (updateTarifDto.actif) {
           await prisma.tarif.updateMany({
             where: {
@@ -198,7 +185,6 @@ export class TarifService {
           });
         }
 
-        // Mettre à jour le tarif
         const updatedTarif = await prisma.tarif.update({
           where: { id },
           data: updateTarifDto,
@@ -215,9 +201,6 @@ export class TarifService {
     }
   }
 
-  /**
-   * ✅ Activer un tarif et désactiver les autres pour le même sous-service et devise
-   */
   async activate(id: number) {
     try {
       const tarif = await this.prisma.tarif.findUnique({
@@ -229,7 +212,6 @@ export class TarifService {
       }
 
       return await this.prisma.$transaction(async (prisma) => {
-        // Désactiver tous les autres tarifs pour le même sous-service et devise
         await prisma.tarif.updateMany({
           where: {
             id: { not: id },
@@ -240,7 +222,6 @@ export class TarifService {
           data: { actif: false },
         });
 
-        // Activer ce tarif
         const activatedTarif = await prisma.tarif.update({
           where: { id },
           data: { actif: true },
@@ -257,9 +238,6 @@ export class TarifService {
     }
   }
 
-  /**
-   * ✅ Supprimer un tarif (soft delete)
-   */
   async delete(id: number) {
     try {
       const tarif = await this.prisma.tarif.findUnique({
@@ -280,4 +258,33 @@ export class TarifService {
       return this.responseService.error(error.message);
     }
   }
+  async deactivate(id: number) {
+    try {
+      const tarif = await this.prisma.tarif.findUnique({
+        where: { id },
+      });
+
+      if (!tarif) {
+        return this.responseService.notFound(`Tarif #${id} non trouvé.`);
+      }
+
+      if (!tarif.actif) {
+        return this.responseService.badRequest([`Le tarif #${id} est déjà inactif.`]);
+      }
+
+      const updated = await this.prisma.tarif.update({
+        where: { id },
+        data: { actif: false },
+        include: {
+          sousService: true,
+          devise: true,
+        },
+      });
+
+      return this.responseService.success(updated, 'Tarif désactivé avec succès.');
+    } catch (error) {
+      return this.responseService.error(error.message);
+    }
+  }
+
 }

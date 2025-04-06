@@ -4,7 +4,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateMedecinSousServiceDto } from './dto/create-medecin-sous-service.dto';
 // @ts-ignore
 import { UpdateMedecinSousServiceDto } from './dto/update-medecin-sous-service.dto';
-
 import { ResponseService } from '../validation/exception/response/response.service';
 
 @Injectable()
@@ -14,9 +13,8 @@ export class MedecinSousServiceService {
     private readonly responseService: ResponseService,
   ) {}
 
-  // ✅ Création d'un médecin sous servic
+  // ✅ Création d'un médecin sous service
   async create(dto: CreateMedecinSousServiceDto, currentUser: any) {
-    // ✅ Vérifier si le sous-service existe
     const sousService = await this.prisma.sousService.findUnique({
       where: { id: dto.idSousService },
     });
@@ -27,14 +25,23 @@ export class MedecinSousServiceService {
       );
     }
 
-    // ✅ Vérifier si l'utilisateur est admin ou le médecin lui-même
-    if (currentUser.profil !== 'Admin' && currentUser.id !== dto.idMedecin) {
+    const user = await this.prisma.utilisateur.findUnique({
+      where: { id: currentUser.id },
+      include: { privilege: true },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException(
+        this.responseService.forbidden("Utilisateur non trouvé.")
+      );
+    }
+
+    if (user.privilege.libelle !== 'Admin' && currentUser.id !== dto.idMedecin) {
       throw new UnauthorizedException(
         this.responseService.forbidden('Seul un administrateur ou le médecin lui-même peut ajouter un sous-service.')
       );
     }
 
-    // ✅ Vérifier si `idMedecin` correspond bien à un utilisateur avec le privilège "Medecin"
     const medecin = await this.prisma.utilisateur.findUnique({
       where: { id: dto.idMedecin },
       include: { privilege: true },
@@ -46,32 +53,29 @@ export class MedecinSousServiceService {
       );
     }
 
-    // ✅ Vérification si le médecin est déjà assigné à ce sous-service
-    const existingMedecinSousService = await this.prisma.medecinSousService.findFirst({
+    const existing = await this.prisma.medecinSousService.findFirst({
       where: {
         idMedecin: dto.idMedecin,
         idSousService: dto.idSousService,
-        deletedAt: null, // On exclut les enregistrements supprimés
+        deletedAt: null,
       },
     });
 
-    if (existingMedecinSousService) {
+    if (existing) {
       throw new UnauthorizedException(
         this.responseService.forbidden('Ce médecin est déjà associé à ce sous-service.')
       );
     }
 
-    // ✅ Création du médecin sous service après toutes les vérifications
-    const medecinSousService = await this.prisma.medecinSousService.create({
+    const created = await this.prisma.medecinSousService.create({
       data: {
         idMedecin: dto.idMedecin,
         idSousService: dto.idSousService,
       },
     });
 
-    return this.responseService.created(medecinSousService, 'Médecin sous-service ajouté avec succès');
+    return this.responseService.created(created, 'Médecin sous-service ajouté avec succès');
   }
-
 
   // ✅ Liste des médecins sous service
   async findAll() {
@@ -99,11 +103,33 @@ export class MedecinSousServiceService {
     return this.responseService.success(data, 'Médecin sous-service récupéré');
   }
 
-  // ✅ Mise à jour d'un médecin sous service (seulement admin ou le médecin concerné)
+  // ✅ Mise à jour d'un médecin sous service
   async update(id: number, dto: UpdateMedecinSousServiceDto, currentUser: any) {
-    const existing = await this.findOne(id);
+    const existing = await this.prisma.medecinSousService.findFirst({
+      where: { id, deletedAt: null },
+    });
 
-    if (currentUser.profil !== 'Admin' && currentUser.profil !== 'Medecin') {
+    if (!existing) {
+      throw new NotFoundException(
+        this.responseService.notFound(`Le médecin sous-service #${id} n'existe pas ou a été supprimé.`)
+      );
+    }
+
+    const user = await this.prisma.utilisateur.findUnique({
+      where: { id: currentUser.id },
+      include: { privilege: true },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException(
+        this.responseService.forbidden("Utilisateur non trouvé.")
+      );
+    }
+
+    if (
+      user.privilege.libelle !== 'Admin' &&
+      currentUser.id !== existing.idMedecin
+    ) {
       throw new UnauthorizedException(
         this.responseService.forbidden("Seul un administrateur ou le médecin concerné peut modifier ce sous-service.")
       );
@@ -119,9 +145,31 @@ export class MedecinSousServiceService {
 
   // ✅ Suppression d'un médecin sous service (soft delete)
   async remove(id: number, currentUser: any) {
-    const existing = await this.findOne(id);
+    const existing = await this.prisma.medecinSousService.findFirst({
+      where: { id, deletedAt: null },
+    });
 
-    if (currentUser.profil !== 'Admin' && currentUser.profil !=='Medeicn') {
+    if (!existing) {
+      throw new NotFoundException(
+        this.responseService.notFound(`Le médecin sous-service #${id} n'existe pas ou a été supprimé.`)
+      );
+    }
+
+    const user = await this.prisma.utilisateur.findUnique({
+      where: { id: currentUser.id },
+      include: { privilege: true },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException(
+        this.responseService.forbidden("Utilisateur non trouvé.")
+      );
+    }
+
+    if (
+      user.privilege.libelle !== 'Admin' &&
+      currentUser.id !== existing.idMedecin
+    ) {
       throw new UnauthorizedException(
         this.responseService.forbidden("Seul un administrateur ou le médecin concerné peut supprimer ce sous-service.")
       );

@@ -83,5 +83,9 @@ export class SousServiceService {
       `Sous-services du service #${idService} récupérés avec succès.`,
     );
   }
+  async findAll() {
+    const sousServices = await this.prisma.sousService.findMany({ where: { deletedAt: null } });
+    return this.responseService.success(sousServices, 'Liste des sous-services récupérée');
+  }
 
 }

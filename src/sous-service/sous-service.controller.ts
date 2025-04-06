@@ -43,5 +43,11 @@ export class SousServiceController {
     return this.sousServiceService.remove(+id);
   }
 
+@Get()
+@ApiConsumes( 'application/json' )
+findAll() {
+  return this.sousServiceService.findAll();
+}
 
 }
+

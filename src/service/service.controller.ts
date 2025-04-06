@@ -13,7 +13,9 @@ import { ApiTags, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
+
   @Post()
+
   @UseInterceptors(FileInterceptor('iconUrl'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateServiceDto })
@@ -42,4 +44,5 @@ export class ServiceController {
   remove(@Param('id') id: string) {
     return this.serviceService.remove(+id);
   }
+
 }
