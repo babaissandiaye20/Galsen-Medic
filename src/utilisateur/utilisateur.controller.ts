@@ -98,5 +98,13 @@ export class UtilisateurController {
   remove(@Param('id') id: string) {
     return this.utilisateurService.remove(+id);
   }
+  @Get('email/:email')
+  @ApiOperation({ summary: 'Récupérer un utilisateur par email' })
+  @ApiResponse({ status: 200, description: 'Utilisateur trouvé' })
+  @ApiResponse({ status: 404, description: "Utilisateur non trouvé" })
+  findByEmail(@Param('email') email: string) {
+    return this.utilisateurService.findUtilisateurByEmail(email);
+  }
+
   // ← uniquement si tu utilises un guard global, mais dans ton cas pas nécessaire
   }

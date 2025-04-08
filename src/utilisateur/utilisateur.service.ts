@@ -238,5 +238,20 @@ export class UtilisateurService {
 
     return this.responseService.success(utilisateurs, 'Liste des utilisateurs avec le privilège Client');
   }
+  async findUtilisateurByEmail(email: string) {
+    const user = await this.prisma.utilisateur.findFirst({
+      where: { email, deletedAt: null },
+      include: { privilege: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException(
+        this.responseService.notFound(`Aucun utilisateur trouvé avec l'email ${email}`)
+      );
+    }
+
+    return this.responseService.success(user, "Utilisateur récupéré avec succès");
+  }
+
 
 }

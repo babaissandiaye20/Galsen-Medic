@@ -9,6 +9,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from './jwt-auth/jwt-auth.guard';
 import { ResponseService } from '../validation/exception/response/response.service';
+import { BlacklistService } from './blacklist/blacklist.service';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ResponseService } from '../validation/exception/response/response.servi
     JwtStrategy,
     JwtAuthGuard,
     ResponseService,
+    BlacklistService,
   ],
   exports: [AuthService, JwtModule], // ✅ Exporter JwtModule pour que d'autres modules puissent l'utiliser
 })

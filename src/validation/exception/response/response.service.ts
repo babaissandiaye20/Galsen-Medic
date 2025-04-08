@@ -70,6 +70,13 @@ export class ResponseService {
       timestamp: new Date().toISOString(),
     };
   }
+  unauthorized(message = 'Non autorisé'): Response<void> {
+    return {
+      statusCode: 401,
+      message,
+      timestamp: new Date().toISOString(),
+    };
+  }
 
 
 }

@@ -224,3 +224,9 @@ model Log {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 }
+
+model BlacklistedToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  expiresAt DateTime
+}
