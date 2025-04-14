@@ -1,0 +1,1075 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>galsen-medic documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	   <link rel="stylesheet" href="../styles/style.css">
+        <link rel="stylesheet" href="../styles/dark.css">
+    </head>
+    <body>
+          <script>
+               // Blocking script to avoid flickering dark mode
+               // Dark mode toggle button
+               var useDark = window.matchMedia('(prefers-color-scheme: dark)');
+               var darkModeState = useDark.matches;
+               var $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               var $darkModeToggles = document.querySelectorAll('.dark-mode-switch');
+               var darkModeStateLocal = localStorage.getItem('compodoc_darkmode-state');
+
+               function checkToggle(check) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].checked = check;
+                    }
+               }
+
+               function toggleDarkMode(state) {
+                    if (window.localStorage) {
+                         localStorage.setItem('compodoc_darkmode-state', state);
+                    }
+
+                    checkToggle(state);
+
+                    const hasClass = document.body.classList.contains('dark');
+
+                    if (state) {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.add('dark');
+                         }
+                         if (!hasClass) {
+                              document.body.classList.add('dark');
+                         }
+                    } else {
+                         for (var i = 0; i < $darkModeToggles.length; i++) {
+                              $darkModeToggles[i].classList.remove('dark');
+                         }
+                         if (hasClass) {
+                              document.body.classList.remove('dark');
+                         }
+                    }
+               }
+
+               useDark.addEventListener('change', function (evt) {
+                    toggleDarkMode(evt.matches);
+               });
+               if (darkModeStateLocal) {
+                    darkModeState = darkModeStateLocal === 'true';
+               }
+               toggleDarkMode(darkModeState);
+          </script>
+
+        <div class="navbar navbar-default navbar-fixed-top d-md-none p-0">
+               <div class="d-flex">
+                    <a href="../" class="navbar-brand">galsen-medic documentation</a>
+                    <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+               </div>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="d-none d-md-block menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content injectable">
+                   <div class="content-data">
+
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Injectables</li>
+  <li class="breadcrumb-item" >DisponibiliteService</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a href="#info" 
+                class="nav-link"
+                class="nav-link active"
+                role="tab" id="info-tab" data-bs-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li class="nav-item">
+            <a href="#source" 
+                class="nav-link"
+                
+                role="tab" id="source-tab" data-bs-toggle="tab" data-link="source">Source</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>src/disponibilite/disponibilite.service.ts</code>
+        </p>
+
+
+
+
+
+            <section data-compodoc="block-index">
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#create" >create</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#findAll" >findAll</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#findDisponibilitesById" >findDisponibilitesById</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#findDisponibilitesByMedecin" >findDisponibilitesByMedecin</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#formatHeure" >formatHeure</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#genererCreneauxDisponibles" >genererCreneauxDisponibles</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#getNumeroSemaine" >getNumeroSemaine</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#parseTime" >parseTime</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+            <section data-compodoc="block-constructor">
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(prisma: <a href="../injectables/PrismaService.html" target="_self">PrismaService</a>, responseService: <a href="../injectables/ResponseService.html" target="_self">ResponseService</a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="8" class="link-to-prism">src/disponibilite/disponibilite.service.ts:8</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>prisma</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/PrismaService.html" target="_self" >PrismaService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>responseService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/ResponseService.html" target="_self" >ResponseService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+            <section data-compodoc="block-methods">
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="create"></a>
+                    <span class="name">
+                            <span class="modifier">Async</span>
+                        <span ><b>create</b></span>
+                        <a href="#create"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>create(createDisponibiliteDto: <a href="../classes/CreateDisponibiliteDto.html" target="_self">CreateDisponibiliteDto</a>, currentUser: <a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank">any</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="17"
+                                    class="link-to-prism">src/disponibilite/disponibilite.service.ts:17</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>✅ Créer une disponibilité (Seulement Medecin/Admin)</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>createDisponibiliteDto</td>
+                                            <td>
+                                                            <code><a href="../classes/CreateDisponibiliteDto.html" target="_self" >CreateDisponibiliteDto</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                        <tr>
+                                                <td>currentUser</td>
+                                            <td>
+                                                            <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>unknown</code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="findAll"></a>
+                    <span class="name">
+                            <span class="modifier">Async</span>
+                        <span ><b>findAll</b></span>
+                        <a href="#findAll"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>findAll()</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="75"
+                                    class="link-to-prism">src/disponibilite/disponibilite.service.ts:75</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>✅ Récupérer toutes les disponibilités actives</p>
+</div>
+
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>unknown</code>
+
+                        </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="findDisponibilitesById"></a>
+                    <span class="name">
+                            <span class="modifier">Async</span>
+                        <span ><b>findDisponibilitesById</b></span>
+                        <a href="#findDisponibilitesById"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>findDisponibilitesById(id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="87"
+                                    class="link-to-prism">src/disponibilite/disponibilite.service.ts:87</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>✅ Récupérer une disponibilité par ID (Avec créneaux disponibles)</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>id</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>unknown</code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="findDisponibilitesByMedecin"></a>
+                    <span class="name">
+                            <span class="modifier">Async</span>
+                        <span ><b>findDisponibilitesByMedecin</b></span>
+                        <a href="#findDisponibilitesByMedecin"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>findDisponibilitesByMedecin(idMedecin: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="159"
+                                    class="link-to-prism">src/disponibilite/disponibilite.service.ts:159</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>✅ Récupérer toutes les disponibilités d&#39;un médecin spécifique</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>idMedecin</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>unknown</code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="formatHeure"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>formatHeure</b></span>
+                        <a href="#formatHeure"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>formatHeure(date: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date" target="_blank">Date</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="153"
+                                    class="link-to-prism">src/disponibilite/disponibilite.service.ts:153</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>✅ Formatter une heure en chaîne lisible</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>date</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date" target="_blank" >Date</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="genererCreneauxDisponibles"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>genererCreneauxDisponibles</b></span>
+                        <a href="#genererCreneauxDisponibles"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>genererCreneauxDisponibles(disponibilite, reservationsSet: Set<string>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="111"
+                                    class="link-to-prism">src/disponibilite/disponibilite.service.ts:111</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>✅ Générer les créneaux disponibles</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>disponibilite</td>
+                                            <td>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                        <tr>
+                                                <td>reservationsSet</td>
+                                            <td>
+                                                        <code>Set&lt;string&gt;</code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>    <code>{}</code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getNumeroSemaine"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>getNumeroSemaine</b></span>
+                        <a href="#getNumeroSemaine"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getNumeroSemaine()</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="133"
+                                    class="link-to-prism">src/disponibilite/disponibilite.service.ts:133</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>✅ Calcul du numéro de la semaine actuelle</p>
+</div>
+
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+
+                        </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="parseTime"></a>
+                    <span class="name">
+                            <span class="modifier">Private</span>
+                        <span ><b>parseTime</b></span>
+                        <a href="#parseTime"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                        <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>parseTime(time: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="143"
+                                    class="link-to-prism">src/disponibilite/disponibilite.service.ts:143</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                        <div class="io-description"><p>✅ Convertir une heure en Date</p>
+</div>
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>time</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date" target="_blank" >Date</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+    </div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from &#x27;@nestjs/common&#x27;;
+import { PrismaService } from &#x27;../prisma/prisma.service&#x27;;
+import { CreateDisponibiliteDto } from &#x27;./dto/create-disponibilite.dto&#x27;;
+import { UpdateDisponibiliteDto } from &#x27;./dto/update-disponibilite.dto&#x27;;
+import { ResponseService } from &#x27;../validation/exception/response/response.service&#x27;;
+
+@Injectable()
+export class DisponibiliteService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly responseService: ResponseService,
+  ) {}
+
+  /**
+   * ✅ Créer une disponibilité (Seulement Medecin/Admin)
+   */
+  async create(createDisponibiliteDto: CreateDisponibiliteDto, currentUser: any) {
+    if (!currentUser) {
+      throw new ForbiddenException(this.responseService.forbidden(&quot;Vous devez être connecté.&quot;));
+    }
+
+    // Vérification des rôles autorisés
+    const user &#x3D; await this.prisma.utilisateur.findUnique({
+      where: { id: currentUser.id },
+      include: { privilege: true },
+    });
+
+    if (!user || ![&#x27;Medecin&#x27;, &#x27;Admin&#x27;].includes(user.privilege.libelle)) {
+      throw new ForbiddenException(this.responseService.forbidden(&quot;Seuls les médecins et administrateurs peuvent créer une disponibilité.&quot;));
+    }
+
+    // Validation des jours de la semaine
+    const joursValid &#x3D; [&quot;lundi&quot;, &quot;mardi&quot;, &quot;mercredi&quot;, &quot;jeudi&quot;, &quot;vendredi&quot;, &quot;samedi&quot;, &quot;dimanche&quot;];
+    const jourSemaineNormalized &#x3D; createDisponibiliteDto.jourSemaine.trim().toLowerCase();
+
+    if (!joursValid.includes(jourSemaineNormalized)) {
+      throw new BadRequestException(&#x60;Jour invalide. Choisissez parmi : ${joursValid.join(&quot;, &quot;)}.&#x60;);
+    }
+
+    // Vérifier si une disponibilité existe déjà pour ce médecin et ce jour
+    const existingDisponibilite &#x3D; await this.prisma.disponibilite.findFirst({
+      where: {
+        idMedecinSousService: createDisponibiliteDto.idMedecinSousService,
+        jourSemaine: jourSemaineNormalized,
+        active: true,
+      },
+    });
+
+    if (existingDisponibilite) {
+      throw new BadRequestException(
+        &quot;Une disponibilité pour ce jour existe déjà. Modifiez-la au lieu d&#x27;en créer une nouvelle.&quot;
+      );
+    }
+
+    // Création de la disponibilité
+    const disponibilite &#x3D; await this.prisma.disponibilite.create({
+      data: {
+        idMedecinSousService: createDisponibiliteDto.idMedecinSousService,
+        jourSemaine: jourSemaineNormalized,
+        heureDebut: createDisponibiliteDto.heureDebut,
+        heureFin: createDisponibiliteDto.heureFin,
+        pauseDebut: createDisponibiliteDto.pauseDebut,
+        pauseFin: createDisponibiliteDto.pauseFin,
+        active: true,
+        semaine: this.getNumeroSemaine(),
+      },
+    });
+
+    return this.responseService.created(disponibilite, &#x27;Disponibilité créée avec succès&#x27;);
+  }
+
+  /**
+   * ✅ Récupérer toutes les disponibilités actives
+   */
+  async findAll() {
+    const disponibilites &#x3D; await this.prisma.disponibilite.findMany({
+      where: { active: true },
+      orderBy: { jourSemaine: &#x27;asc&#x27; },
+    });
+
+    return this.responseService.success(disponibilites, &#x27;Toutes les disponibilités récupérées&#x27;);
+  }
+
+  /**
+   * ✅ Récupérer une disponibilité par ID (Avec créneaux disponibles)
+   */
+  async findDisponibilitesById(id: number) {
+    const disponibilite &#x3D; await this.prisma.disponibilite.findUnique({ where: { id } });
+
+    if (!disponibilite) {
+      throw new NotFoundException(this.responseService.notFound(&#x60;Disponibilité #${id} non trouvée.&#x60;));
+    }
+
+    const reservations &#x3D; await this.prisma.reservation.findMany({
+      where: { idMedecinSousService: disponibilite.idMedecinSousService },
+      select: { heureDebut: true, heureFin: true },
+    });
+
+    const reservationsSet &#x3D; new Set(reservations.map(r &#x3D;&gt; &#x60;${r.heureDebut}-${r.heureFin}&#x60;));
+    const horairesDisponibles &#x3D; this.genererCreneauxDisponibles(disponibilite, reservationsSet);
+
+    return this.responseService.success(
+      { ...disponibilite, horairesDisponibles },
+      &#x27;Disponibilité récupérée avec créneaux disponibles&#x27;
+    );
+  }
+
+  /**
+   * ✅ Générer les créneaux disponibles
+   */
+  private genererCreneauxDisponibles(disponibilite, reservationsSet: Set&lt;string&gt;) {
+    const horairesDisponibles: string[] &#x3D; [];
+    let currentHeure &#x3D; this.parseTime(disponibilite.heureDebut);
+    const fin &#x3D; this.parseTime(disponibilite.heureFin);
+
+    while (currentHeure &lt; fin) {
+      const nextHeure &#x3D; new Date(currentHeure.getTime() + 30 * 60000);
+      const creneau &#x3D; &#x60;${this.formatHeure(currentHeure)} - ${this.formatHeure(nextHeure)}&#x60;;
+
+      if (!reservationsSet.has(creneau)) {
+        horairesDisponibles.push(creneau);
+      }
+
+      currentHeure &#x3D; nextHeure;
+    }
+
+    return horairesDisponibles;
+  }
+
+  /**
+   * ✅ Calcul du numéro de la semaine actuelle
+   */
+  private getNumeroSemaine(): number {
+    const date &#x3D; new Date();
+    const debutAnnee &#x3D; new Date(date.getFullYear(), 0, 1);
+    const joursEcoules &#x3D; Math.floor((date.getTime() - debutAnnee.getTime()) / (24 * 60 * 60 * 1000));
+    return Math.ceil((joursEcoules + debutAnnee.getDay() + 1) / 7);
+  }
+
+  /**
+   * ✅ Convertir une heure en Date
+   */
+  private parseTime(time: string): Date {
+    const [hours, minutes] &#x3D; time.split(&#x27;:&#x27;).map(Number);
+    const date &#x3D; new Date();
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+  }
+
+  /**
+   * ✅ Formatter une heure en chaîne lisible
+   */
+  private formatHeure(date: Date): string {
+    return &#x60;${date.getHours().toString().padStart(2, &#x27;0&#x27;)}:${date.getMinutes().toString().padStart(2, &#x27;0&#x27;)}&#x60;;
+  }
+  /**
+   * ✅ Récupérer toutes les disponibilités d&#x27;un médecin spécifique
+   */
+  async findDisponibilitesByMedecin(idMedecin: number) {
+    const medecin &#x3D; await this.prisma.utilisateur.findUnique({
+      where: { id: idMedecin },
+      include: { MedecinSousService: true },
+    });
+
+    if (!medecin) {
+      throw new NotFoundException(
+        this.responseService.notFound(&#x60;Médecin #${idMedecin} non trouvé.&#x60;)
+      );
+    }
+
+    const disponibilites &#x3D; await this.prisma.disponibilite.findMany({
+      where: {
+        idMedecinSousService: {
+          in: medecin.MedecinSousService.map((mss) &#x3D;&gt; mss.id),
+        },
+        active: true,
+      },
+      orderBy: { jourSemaine: &#x27;asc&#x27; },
+    });
+
+    // ✅ Ajouter les horaires disponibles à chaque disponibilité
+    const withCreneaux &#x3D; await Promise.all(disponibilites.map(async (dispo) &#x3D;&gt; {
+      const reservations &#x3D; await this.prisma.reservation.findMany({
+        where: { idMedecinSousService: dispo.idMedecinSousService },
+        select: { heureDebut: true, heureFin: true },
+      });
+
+      const reservationsSet &#x3D; new Set(reservations.map(r &#x3D;&gt; &#x60;${r.heureDebut}-${r.heureFin}&#x60;));
+      const horairesDisponibles &#x3D; this.genererCreneauxDisponibles(dispo, reservationsSet);
+
+      return {
+        ...dispo,
+        horairesDisponibles,
+      };
+    }));
+
+    return this.responseService.success(
+      withCreneaux,
+      &#x60;Disponibilités du médecin #${idMedecin} récupérées&#x60;
+    );
+  }
+
+}
+</code></pre>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+          <label class="dark-mode-switch">
+               <input type="checkbox">
+               <span class="slider">
+                    <svg class="slider-icon" viewBox="0 0 24 24" fill="none" height="20" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+               </span>
+          </label>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'injectable';
+            var COMPODOC_CURRENT_PAGE_URL = 'DisponibiliteService.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script>
+               $darkModeToggleSwitchers = document.querySelectorAll('.dark-mode-switch input');
+               checkToggle(darkModeState);
+               if ($darkModeToggleSwitchers.length > 0) {
+                    for (var i = 0; i < $darkModeToggleSwitchers.length; i++) {
+                         $darkModeToggleSwitchers[i].addEventListener('change', function (event) {
+                              darkModeState = !darkModeState;
+                              toggleDarkMode(darkModeState);
+                         });
+                    }
+               }
+          </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+
+       <script src="../js/menu-wc.js" defer></script>
+       <script nomodule src="../js/menu-wc_es5.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

@@ -63,6 +63,7 @@ export class ResponseService {
   }
 
 
+
   error(message = 'Erreur interne du serveur'): Response<void> {
     return {
       statusCode: 500,

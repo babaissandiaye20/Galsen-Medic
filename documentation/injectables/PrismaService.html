@@ -161,6 +161,54 @@
     </table>
 </section>
 
+            <section data-compodoc="block-constructor">
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(eventEmitter: EventEmitter2)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="7" class="link-to-prism">src/prisma/prisma.service.ts:7</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>eventEmitter</td>
+                                                  
+                                                        <td>
+                                                                    <code>EventEmitter2</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
 
             <section data-compodoc="block-methods">
     
@@ -189,8 +237,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="19"
-                                    class="link-to-prism">src/prisma/prisma.service.ts:19</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="24"
+                                    class="link-to-prism">src/prisma/prisma.service.ts:24</a></div>
                         </td>
                     </tr>
 
@@ -228,8 +276,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="8"
-                                    class="link-to-prism">src/prisma/prisma.service.ts:8</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="13"
+                                    class="link-to-prism">src/prisma/prisma.service.ts:13</a></div>
                         </td>
                     </tr>
 
@@ -253,26 +301,32 @@
     <div class="tab-pane fade  tab-source-code" id="source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable, OnModuleInit, OnModuleDestroy } from &#x27;@nestjs/common&#x27;;
 import { PrismaClient } from &#x27;@prisma/client&#x27;;
+import { EventEmitter2 } from &#x27;@nestjs/event-emitter&#x27;;
+import { loggingMiddleware } from &#x27;./prisma.middleware&#x27;;
+
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  constructor(private eventEmitter: EventEmitter2) {
+    super();
+    this.$use(loggingMiddleware(this.eventEmitter));
+  }
+
   async onModuleInit() {
     try {
       await this.$connect();
-      console.log(&#x27;Connected to the database&#x27;);
-      // Ajoutez ce log pour vérifier les tables disponibles
-      console.log(&#x27;Available models:&#x27;, Object.keys(this));
+      console.log(&#x27;✅ Connected to the database&#x27;);
+      console.log(&#x27;🧩 Available models:&#x27;, Object.keys(this));
     } catch (error) {
-      console.error(&#x27;Failed to connect to the database&#x27;, error);
+      console.error(&#x27;❌ Failed to connect to the database&#x27;, error);
       process.exit(1);
     }
   }
+
   async onModuleDestroy() {
     await this.$disconnect();
   }
-}</code></pre>
+}
+</code></pre>
     </div>
 
 </div>

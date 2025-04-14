@@ -223,7 +223,7 @@
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="44" class="link-to-prism">src/generated/nestjs-dto/update-utilisateur.dto.ts:44</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="45" class="link-to-prism">src/generated/nestjs-dto/update-utilisateur.dto.ts:45</a></div>
                         </td>
                     </tr>
 
@@ -393,7 +393,7 @@
             </tr>
                 <tr>
                     <td class="col-md-4">
-                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                        <i>Type : </i>    <code>string | null</code>
 
                     </td>
                 </tr>
@@ -402,13 +402,13 @@
                         <b>Decorators : </b>
                         <br />
                         <code>
-                            @ApiProperty({type: &#x27;string&#x27;, required: false})<br />
+                            @ApiProperty({type: &#x27;string&#x27;, required: false, nullable: true})<br />
                         </code>
                     </td>
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="37" class="link-to-prism">src/generated/nestjs-dto/update-utilisateur.dto.ts:37</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="38" class="link-to-prism">src/generated/nestjs-dto/update-utilisateur.dto.ts:38</a></div>
                         </td>
                     </tr>
 
@@ -498,8 +498,9 @@ telephone?: string ;
 @ApiProperty({
   type: &#x27;string&#x27;,
   required: false,
+  nullable: true,
 })
-profil?: string ;
+profil?: string  | null;
 @ApiProperty({
   type: &#x27;string&#x27;,
   format: &#x27;date-time&#x27;,

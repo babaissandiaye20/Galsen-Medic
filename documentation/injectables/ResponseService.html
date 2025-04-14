@@ -139,7 +139,13 @@
                                 <a href="#badRequest" >badRequest</a>
                             </li>
                             <li>
+                                <a href="#conflict" >conflict</a>
+                            </li>
+                            <li>
                                 <a href="#created" >created</a>
+                            </li>
+                            <li>
+                                <a href="#error" >error</a>
                             </li>
                             <li>
                                 <a href="#forbidden" >forbidden</a>
@@ -152,6 +158,9 @@
                             </li>
                             <li>
                                 <a href="#success" >success</a>
+                            </li>
+                            <li>
+                                <a href="#unauthorized" >unauthorized</a>
                             </li>
                         </ul>
                     </td>
@@ -191,8 +200,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="25"
-                                    class="link-to-prism">src/validation/exception/response/response.service.ts:25</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="24"
+                                    class="link-to-prism">src/validation/exception/response/response.service.ts:24</a></div>
                         </td>
                     </tr>
 
@@ -239,6 +248,77 @@
 
                                             <td>
                                                     <code>&#x27;Requête invalide&#x27;</code>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="../interfaces/Response.html" target="_self" >Response&lt;void&gt;</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="conflict"></a>
+                    <span class="name">
+                        <span ><b>conflict</b></span>
+                        <a href="#conflict"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>conflict(message: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="57"
+                                    class="link-to-prism">src/validation/exception/response/response.service.ts:57</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Default value</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>message</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+                                            <td>
+                                                    <code>&#x27;Conflit détecté&#x27;</code>
                                             </td>
 
                                         </tr>
@@ -353,6 +433,77 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
+                    <a name="error"></a>
+                    <span class="name">
+                        <span ><b>error</b></span>
+                        <a href="#error"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>error(message: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="67"
+                                    class="link-to-prism">src/validation/exception/response/response.service.ts:67</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Default value</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>message</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+                                            <td>
+                                                    <code>&#x27;Erreur interne du serveur&#x27;</code>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="../interfaces/Response.html" target="_self" >Response&lt;void&gt;</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
                     <a name="forbidden"></a>
                     <span class="name">
                         <span ><b>forbidden</b></span>
@@ -369,8 +520,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="34"
-                                    class="link-to-prism">src/validation/exception/response/response.service.ts:34</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="33"
+                                    class="link-to-prism">src/validation/exception/response/response.service.ts:33</a></div>
                         </td>
                     </tr>
 
@@ -440,8 +591,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="50"
-                                    class="link-to-prism">src/validation/exception/response/response.service.ts:50</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="49"
+                                    class="link-to-prism">src/validation/exception/response/response.service.ts:49</a></div>
                         </td>
                     </tr>
 
@@ -511,8 +662,8 @@
 
                     <tr>
                         <td class="col-md-4">
-                            <div class="io-line">Defined in <a href="" data-line="42"
-                                    class="link-to-prism">src/validation/exception/response/response.service.ts:42</a></div>
+                            <div class="io-line">Defined in <a href="" data-line="41"
+                                    class="link-to-prism">src/validation/exception/response/response.service.ts:41</a></div>
                         </td>
                     </tr>
 
@@ -655,6 +806,77 @@
             </tr>
         </tbody>
     </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="unauthorized"></a>
+                    <span class="name">
+                        <span ><b>unauthorized</b></span>
+                        <a href="#unauthorized"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>unauthorized(message: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <div class="io-line">Defined in <a href="" data-line="74"
+                                    class="link-to-prism">src/validation/exception/response/response.service.ts:74</a></div>
+                        </td>
+                    </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                            <div class="io-description">
+                                <b>Parameters :</b>
+                                
+                                <table class="params">
+                                    <thead>
+                                        <tr>
+                                            <td>Name</td>
+                                                <td>Type</td>
+                                            <td>Optional</td>
+                                                <td>Default value</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                                <td>message</td>
+                                            <td>
+                                                            <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                            </td>
+
+                                            <td>
+                                                    No
+                                            </td>
+
+                                            <td>
+                                                    <code>&#x27;Non autorisé&#x27;</code>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <div class="io-description">
+                            <b>Returns : </b>        <code><a href="../interfaces/Response.html" target="_self" >Response&lt;void&gt;</a></code>
+
+                        </div>
+                            <div class="io-description">
+                                
+                            </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </section>
 
     </div>
@@ -662,7 +884,7 @@
 
     <div class="tab-pane fade  tab-source-code" id="source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@nestjs/common&#x27;;
-import {Response} from &#x27;./response.interface&#x27;;
+import { Response } from &#x27;./response.interface&#x27;;
 
 @Injectable()
 export class ResponseService {
@@ -684,7 +906,6 @@ export class ResponseService {
     };
   }
 
-  // Ajout du type void pour les méthodes qui ne retournent pas de données
   badRequest(errors: string[], message &#x3D; &#x27;Requête invalide&#x27;): Response&lt;void&gt; {
     return {
       statusCode: 400,
@@ -717,7 +938,35 @@ export class ResponseService {
       timestamp: new Date().toISOString(),
     };
   }
-}</code></pre>
+
+  conflict(message &#x3D; &#x27;Conflit détecté&#x27;): Response&lt;void&gt; {
+    return {
+      statusCode: 409,
+      message,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+
+
+  error(message &#x3D; &#x27;Erreur interne du serveur&#x27;): Response&lt;void&gt; {
+    return {
+      statusCode: 500,
+      message,
+      timestamp: new Date().toISOString(),
+    };
+  }
+  unauthorized(message &#x3D; &#x27;Non autorisé&#x27;): Response&lt;void&gt; {
+    return {
+      statusCode: 401,
+      message,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+
+}
+</code></pre>
     </div>
 
 </div>
