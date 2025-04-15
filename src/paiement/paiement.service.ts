@@ -1,115 +1,230 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-  ForbiddenException,
-} from '@nestjs/common';
+// src/paiement/paiement.service.ts
+import { Injectable, ConflictException, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreatePaiementDto } from './dto/create-paiement.dto';
-import { UpdatePaiementDto } from './dto/update-paiement.dto';
 import { ResponseService } from '../validation/exception/response/response.service';
+import { CreatePaiementNabooDto } from './dto/create-paiement-naboo.dto';
+import { PaiementNabooService } from './paiement-naboo/paiement-naboo.service';
+
+import * as crypto from 'crypto';
+import { ReservationDocumentService } from '../reservation/reservation-document/reservation-document.service';
 
 @Injectable()
 export class PaiementService {
+  private readonly webhookSecret = process.env.WEBHOOK_SECRET || 'bba93370af52ecd7a64549a9bf09aa321a2d4dd0';
+
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly responseService: ResponseService,
+    private prisma: PrismaService,
+    private response: ResponseService,
+    private naboo: PaiementNabooService,
+    private documentService: ReservationDocumentService,
   ) {}
 
-  async create(dto: CreatePaiementDto, currentUser: any) {
-    if (!currentUser) {
-      throw new ForbiddenException(this.responseService.forbidden("Vous devez être connecté."));
-    }
-
+  async payer(dto: CreatePaiementNabooDto, currentUser: any) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: dto.idReservation },
+      include: {
+        paiement: true,
+        medecinSousService: {
+          include: {
+            sousService: {
+              include: {
+                tarifs: {
+                  where: { actif: true },
+                  include: { devise: true },
+                },
+              },
+            },
+          },
+        },
+        statutReservation: true,
+      },
     });
 
     if (!reservation) {
-      throw new NotFoundException(this.responseService.notFound("Réservation introuvable."));
+      throw new NotFoundException(this.response.notFound('Réservation introuvable'));
+    }
+    if (reservation.paiement) {
+      throw new ConflictException(this.response.conflict('Paiement déjà existant'));
+    }
+    if (reservation.idUtilisateur !== currentUser.id && currentUser.privilege?.libelle !== 'Admin') {
+      throw new ForbiddenException(this.response.forbidden('Accès non autorisé à cette réservation'));
     }
 
-    const existingPaiement = await this.prisma.paiement.findUnique({
-      where: { idReservation: dto.idReservation },
+    const tarif = reservation.medecinSousService?.sousService?.tarifs[0];
+    if (!tarif) {
+      throw new NotFoundException(this.response.notFound('Aucun tarif disponible'));
+    }
+
+    const modePaiement = await this.prisma.modePaiement.findUnique({
+      where: { id: dto.idModePaiement },
     });
-
-    if (existingPaiement) {
-      throw new ConflictException(this.responseService.conflict("Un paiement existe déjà pour cette réservation."));
+    if (!modePaiement) {
+      throw new NotFoundException(this.response.notFound('Mode de paiement invalide'));
     }
+
+    const result = await this.naboo.createTransaction({
+      montant: tarif.montant,
+      method: modePaiement.libelle as 'WAVE' | 'ORANGE_MONEY' | 'FREE_MONEY',
+      description: `Paiement pour réservation #${reservation.id}`,
+    });
 
     const paiement = await this.prisma.paiement.create({
       data: {
         idReservation: dto.idReservation,
-        montant: dto.montant,
+        montant: result.montant,
         idModePaiement: dto.idModePaiement,
-        referenceTransaction: `SIM-${Date.now()}`,
-        qrCodeUrl: 'https://dummy.qr.code/url',
-        paiementUrl: 'https://dummy.payment.link',
-        etatTransaction: dto.etatTransaction ?? 'SUCCES',
+        referenceTransaction: result.orderId,
+        paiementUrl: result.paiementUrl,
+        etatTransaction: result.statut,
       },
     });
 
-    return this.responseService.created(paiement, "Paiement créé avec succès.");
-  }
+    const qrResult = await this.documentService.generateAndUploadQRCode(
+      reservation.id,
+      `${process.env.API_BASE_URL || 'https://votreapi.com'}/reservations/${reservation.id}`,
+    );
+    const pdfResult = await this.documentService.generateAndUploadPDF(reservation);
 
-  async findAll() {
-    const paiements = await this.prisma.paiement.findMany({
-      where: { deletedAt: null },
-      include: {
-        modePaiement: true,
-        reservation: true,
-      },
-    });
-
-    return this.responseService.success(paiements, "Liste des paiements récupérée.");
-  }
-
-  async findById(id: number) {
-    const paiement = await this.prisma.paiement.findUnique({
-      where: { id },
-      include: {
-        modePaiement: true,
-        reservation: true,
-      },
-    });
-
-    if (!paiement) {
-      throw new NotFoundException(this.responseService.notFound(`Paiement #${id} introuvable.`));
-    }
-
-    return this.responseService.success(paiement, "Paiement récupéré.");
-  }
-
-  async update(id: number, dto: UpdatePaiementDto, currentUser: any) {
-    const paiement = await this.prisma.paiement.findUnique({ where: { id } });
-
-    if (!paiement) {
-      throw new NotFoundException(this.responseService.notFound("Paiement introuvable."));
-    }
-
-    const updated = await this.prisma.paiement.update({
-      where: { id },
+    const updatedReservation = await this.prisma.reservation.update({
+      where: { id: reservation.id },
       data: {
-        ...dto,
-        updatedAt: new Date(),
+        qrCodeUrl: qrResult.url,
+        pdfUrl: pdfResult.url,
+        etatPaiement: 'PENDING',
+      },
+      include: {
+        medecinSousService: { include: { sousService: true } },
+        paiement: true,
+        statutReservation: true,
       },
     });
 
-    return this.responseService.success(updated, "Paiement mis à jour.");
+    return this.response.created(
+      { paiement, reservation: updatedReservation, qrCode: qrResult, pdf: pdfResult },
+      'Transaction initiée, veuillez compléter le paiement',
+    );
   }
 
-  async remove(id: number) {
-    const paiement = await this.prisma.paiement.findUnique({ where: { id } });
+  async annulerTransaction(orderId: string, currentUser: any) {
+    const paiement = await this.prisma.paiement.findFirst({
+      where: { referenceTransaction: orderId },
+      include: { reservation: { include: { statutReservation: true } } },
+    });
+    if (!paiement) {
+      throw new NotFoundException(this.response.notFound('Transaction introuvable'));
+    }
+
+    if (
+      paiement.reservation.idUtilisateur !== currentUser.id &&
+      currentUser.privilege?.libelle !== 'Admin'
+    ) {
+      throw new ForbiddenException(this.response.forbidden('Annulation non autorisée'));
+    }
+
+    const cancelledStatut = await this.prisma.statutReservation.findFirst({
+      where: { libelle: 'CANCELLED' },
+    });
+    if (!cancelledStatut) {
+      throw new NotFoundException(this.response.notFound('Statut CANCELLED introuvable'));
+    }
+
+    const result = await this.naboo.deleteTransaction(orderId);
+
+    await this.prisma.paiement.delete({
+      where: { id: paiement.id, idReservation: paiement.idReservation },
+    });
+
+    await this.prisma.reservation.update({
+      where: { id: paiement.idReservation },
+      data: {
+        idStatutReservation: cancelledStatut.id,
+        etatPaiement: 'CANCELLED',
+        qrCodeUrl: null,
+        pdfUrl: null,
+      },
+    });
+
+    return this.response.success(result, 'Transaction annulée');
+  }
+
+  async handleNabooWebhook(
+    body: { order_id: string; transaction_status: string; montant: number },
+    signature: string,
+  ) {
+    const computedSignature = crypto
+      .createHmac('sha256', this.webhookSecret)
+      .update(JSON.stringify(body))
+      .digest('hex');
+
+    if (computedSignature !== signature) {
+      throw new BadRequestException('Signature invalide');
+    }
+
+    const paiement = await this.prisma.paiement.findFirst({
+      where: { referenceTransaction: body.order_id },
+      include: { reservation: true },
+    });
 
     if (!paiement) {
-      throw new NotFoundException(this.responseService.notFound("Paiement introuvable."));
+      throw new NotFoundException(this.response.notFound('Paiement introuvable'));
     }
 
     await this.prisma.paiement.update({
-      where: { id },
-      data: { deletedAt: new Date() },
+      where: { id: paiement.id, idReservation: paiement.idReservation },
+      data: { etatTransaction: body.transaction_status },
     });
 
-    return this.responseService.success(null, "Paiement supprimé.");
+    const confirmedStatut = await this.prisma.statutReservation.findFirst({
+      where: { libelle: 'CONFIRMED' },
+    });
+    const cancelledStatut = await this.prisma.statutReservation.findFirst({
+      where: { libelle: 'CANCELLED' },
+    });
+
+    if (!confirmedStatut || !cancelledStatut) {
+      throw new NotFoundException(this.response.notFound('Statut de réservation introuvable'));
+    }
+
+    if (body.transaction_status === 'COMPLETED') {
+      await this.prisma.reservation.update({
+        where: { id: paiement.idReservation },
+        data: {
+          idStatutReservation: confirmedStatut.id,
+          etatPaiement: 'PAID',
+        },
+      });
+    } else if (body.transaction_status === 'FAILED' || body.transaction_status === 'CANCELLED') {
+      await this.prisma.reservation.update({
+        where: { id: paiement.idReservation },
+        data: {
+          idStatutReservation: cancelledStatut.id,
+          etatPaiement: 'CANCELLED',
+          qrCodeUrl: null,
+          pdfUrl: null,
+        },
+      });
+    }
+
+    return this.response.success(null, 'Webhook traité avec succès');
+  }
+
+  async handleSuccess(orderId: string) {
+    const paiement = await this.prisma.paiement.findFirst({
+      where: { referenceTransaction: orderId },
+    });
+    if (!paiement) {
+      throw new NotFoundException(this.response.notFound('Paiement introuvable'));
+    }
+    return this.response.success({ orderId, status: 'success' }, 'Paiement réussi (test)');
+  }
+
+  async handleError(orderId: string) {
+    const paiement = await this.prisma.paiement.findFirst({
+      where: { referenceTransaction: orderId },
+    });
+    if (!paiement) {
+      throw new NotFoundException(this.response.notFound('Paiement introuvable'));
+    }
+    return this.response.success({ orderId, status: 'error' }, 'Paiement échoué (test)');
   }
 }

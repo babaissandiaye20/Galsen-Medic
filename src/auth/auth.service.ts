@@ -43,7 +43,7 @@ export class AuthService {
       throw new UnauthorizedException('Mot de passe incorrect');
     }
     return utilisateur;
-  }
+  }a
 
   async logout(token: string) {
     const secret = this.configService.get<string>('JWT_SECRET');

@@ -34,14 +34,17 @@ import { ModePaiementModule } from './mode-paiement/mode-paiement.module';
 import { PaiementService } from './paiement/paiement.service';
 import { PaiementController } from './paiement/paiement.controller';
 import { PaiementModule } from './paiement/paiement.module';
+import { ReservationModule } from './reservation/reservation.module';
+import { PaiementNabooService } from './paiement/paiement-naboo/paiement-naboo.service';
+
 
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
-    PrismaModule, PrivilegeModule, ValidationModule, UtilisateurModule, AuthModule, LogModule, UploadModule, ServiceModule, SousServiceModule, MedecinSousserviceModule, DisponibiliteModule, TarifModule, StatutReservationModule, ModePaiementModule, PaiementModule],
+    PrismaModule, PrivilegeModule, ValidationModule, UtilisateurModule, AuthModule, LogModule, UploadModule, ServiceModule, SousServiceModule, MedecinSousserviceModule, DisponibiliteModule, TarifModule, StatutReservationModule, ModePaiementModule, PaiementModule,ReservationModule],
   controllers: [AppController, DisponibiliteController, DeviseController, TarifController, StatutReservationController, PaiementController],
-  providers: [AppService, PrismaService, ValidationService, ServiceService,UploadService, DisponibiliteService, DeviseService, TarifService, StatutReservationService, PaiementService],
+  providers: [AppService, PrismaService, ValidationService, ServiceService,UploadService, DisponibiliteService, DeviseService, TarifService, StatutReservationService, PaiementService, PaiementNabooService],
 })
 export class AppModule {}

@@ -26,81 +26,81 @@
 </g>
 <g id="clust4" class="cluster">
 <title>cluster_LogModule_exports</title>
-<polygon fill="none" stroke="black" points="268,-208 268,-260 368,-260 368,-208 268,-208"/>
-</g>
-<g id="clust3" class="cluster">
-<title>cluster_LogModule_imports</title>
-<polygon fill="none" stroke="black" points="458,-78 458,-130 572,-130 572,-78 458,-78"/>
+<polygon fill="none" stroke="black" points="248,-208 248,-260 348,-260 348,-208 248,-208"/>
 </g>
 <g id="clust6" class="cluster">
 <title>cluster_LogModule_providers</title>
-<polygon fill="none" stroke="black" points="16,-78 16,-130 450,-130 450,-78 16,-78"/>
+<polygon fill="none" stroke="black" points="138,-78 138,-130 572,-130 572,-78 138,-78"/>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_LogModule_imports</title>
+<polygon fill="none" stroke="black" points="16,-78 16,-130 130,-130 130,-78 16,-78"/>
 </g>
 <!-- PrismaModule -->
 <g id="node1" class="node">
 <title>PrismaModule</title>
-<polygon fill="#8dd3c7" stroke="black" points="564.43,-122 561.43,-126 540.43,-126 537.43,-122 465.57,-122 465.57,-86 564.43,-86 564.43,-122"/>
-<text text-anchor="middle" x="515" y="-99.8" font-family="Times,serif" font-size="14.00">PrismaModule</text>
+<polygon fill="#8dd3c7" stroke="black" points="122.43,-122 119.43,-126 98.43,-126 95.43,-122 23.57,-122 23.57,-86 122.43,-86 122.43,-122"/>
+<text text-anchor="middle" x="73" y="-99.8" font-family="Times,serif" font-size="14.00">PrismaModule</text>
 </g>
 <!-- LogModule -->
 <g id="node2" class="node">
 <title>LogModule</title>
-<polygon fill="#8dd3c7" stroke="black" points="359.1,-187 356.1,-191 335.1,-191 332.1,-187 276.9,-187 276.9,-151 359.1,-151 359.1,-187"/>
-<text text-anchor="middle" x="318" y="-164.8" font-family="Times,serif" font-size="14.00">LogModule</text>
+<polygon fill="#8dd3c7" stroke="black" points="339.1,-187 336.1,-191 315.1,-191 312.1,-187 256.9,-187 256.9,-151 339.1,-151 339.1,-187"/>
+<text text-anchor="middle" x="298" y="-164.8" font-family="Times,serif" font-size="14.00">LogModule</text>
 </g>
 <!-- PrismaModule&#45;&gt;LogModule -->
 <g id="edge1" class="edge">
 <title>PrismaModule&#45;&gt;LogModule</title>
-<path fill="none" stroke="black" d="M515,-122.11C515,-141.34 515,-169 515,-169 515,-169 369.3,-169 369.3,-169"/>
-<polygon fill="black" stroke="black" points="369.3,-165.5 359.3,-169 369.3,-172.5 369.3,-165.5"/>
+<path fill="none" stroke="black" d="M73,-122.11C73,-141.34 73,-169 73,-169 73,-169 246.73,-169 246.73,-169"/>
+<polygon fill="black" stroke="black" points="246.73,-172.5 256.73,-169 246.73,-165.5 246.73,-172.5"/>
 </g>
 <!-- LogService  -->
 <g id="node3" class="node">
 <title>LogService </title>
-<polygon fill="#fb8072" stroke="black" points="360.03,-252 275.97,-252 275.97,-216 360.03,-216 360.03,-252"/>
-<text text-anchor="middle" x="318" y="-229.8" font-family="Times,serif" font-size="14.00">LogService </text>
+<polygon fill="#fb8072" stroke="black" points="340.03,-252 255.97,-252 255.97,-216 340.03,-216 340.03,-252"/>
+<text text-anchor="middle" x="298" y="-229.8" font-family="Times,serif" font-size="14.00">LogService </text>
 </g>
 <!-- LogModule&#45;&gt;LogService  -->
 <g id="edge2" class="edge">
 <title>LogModule&#45;&gt;LogService </title>
-<path fill="none" stroke="black" stroke-dasharray="5,2" d="M318,-187.11C318,-187.11 318,-205.99 318,-205.99"/>
-<polygon fill="black" stroke="black" points="314.5,-205.99 318,-215.99 321.5,-205.99 314.5,-205.99"/>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M298,-187.11C298,-187.11 298,-205.99 298,-205.99"/>
+<polygon fill="black" stroke="black" points="294.5,-205.99 298,-215.99 301.5,-205.99 294.5,-205.99"/>
 </g>
 <!-- LogListener -->
 <g id="node4" class="node">
 <title>LogListener</title>
-<ellipse fill="#fdb462" stroke="black" cx="384" cy="-104" rx="58.46" ry="18"/>
-<text text-anchor="middle" x="384" y="-99.8" font-family="Times,serif" font-size="14.00">LogListener</text>
+<ellipse fill="#fdb462" stroke="black" cx="506" cy="-104" rx="58.46" ry="18"/>
+<text text-anchor="middle" x="506" y="-99.8" font-family="Times,serif" font-size="14.00">LogListener</text>
 </g>
 <!-- LogListener&#45;&gt;LogModule -->
 <g id="edge3" class="edge">
 <title>LogListener&#45;&gt;LogModule</title>
-<path fill="none" stroke="black" d="M342.41,-116.84C342.41,-116.84 342.41,-140.52 342.41,-140.52"/>
-<polygon fill="black" stroke="black" points="338.91,-140.52 342.41,-150.52 345.91,-140.52 338.91,-140.52"/>
+<path fill="none" stroke="black" d="M506,-122.11C506,-141.34 506,-169 506,-169 506,-169 349.09,-169 349.09,-169"/>
+<polygon fill="black" stroke="black" points="349.09,-165.5 339.09,-169 349.09,-172.5 349.09,-165.5"/>
 </g>
 <!-- LogService -->
 <g id="node5" class="node">
 <title>LogService</title>
-<ellipse fill="#fdb462" stroke="black" cx="252" cy="-104" rx="55.6" ry="18"/>
-<text text-anchor="middle" x="252" y="-99.8" font-family="Times,serif" font-size="14.00">LogService</text>
+<ellipse fill="#fdb462" stroke="black" cx="374" cy="-104" rx="55.6" ry="18"/>
+<text text-anchor="middle" x="374" y="-99.8" font-family="Times,serif" font-size="14.00">LogService</text>
 </g>
 <!-- LogService&#45;&gt;LogModule -->
 <g id="edge4" class="edge">
 <title>LogService&#45;&gt;LogModule</title>
-<path fill="none" stroke="black" d="M292.25,-116.53C292.25,-116.53 292.25,-140.85 292.25,-140.85"/>
-<polygon fill="black" stroke="black" points="288.75,-140.85 292.25,-150.85 295.75,-140.85 288.75,-140.85"/>
+<path fill="none" stroke="black" d="M328.75,-114.44C328.75,-114.44 328.75,-140.97 328.75,-140.97"/>
+<polygon fill="black" stroke="black" points="325.25,-140.97 328.75,-150.97 332.25,-140.97 325.25,-140.97"/>
 </g>
 <!-- ResponseService -->
 <g id="node6" class="node">
 <title>ResponseService</title>
-<ellipse fill="#fdb462" stroke="black" cx="101" cy="-104" rx="77" ry="18"/>
-<text text-anchor="middle" x="101" y="-99.8" font-family="Times,serif" font-size="14.00">ResponseService</text>
+<ellipse fill="#fdb462" stroke="black" cx="223" cy="-104" rx="77" ry="18"/>
+<text text-anchor="middle" x="223" y="-99.8" font-family="Times,serif" font-size="14.00">ResponseService</text>
 </g>
 <!-- ResponseService&#45;&gt;LogModule -->
 <g id="edge5" class="edge">
 <title>ResponseService&#45;&gt;LogModule</title>
-<path fill="none" stroke="black" d="M101,-122.11C101,-141.34 101,-169 101,-169 101,-169 266.93,-169 266.93,-169"/>
-<polygon fill="black" stroke="black" points="266.93,-172.5 276.93,-169 266.93,-165.5 266.93,-172.5"/>
+<path fill="none" stroke="black" d="M278.48,-116.53C278.48,-116.53 278.48,-140.85 278.48,-140.85"/>
+<polygon fill="black" stroke="black" points="274.98,-140.85 278.48,-150.85 281.98,-140.85 274.98,-140.85"/>
 </g>
 </g>
 </svg>
