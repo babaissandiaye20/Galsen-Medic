@@ -1,10 +1,11 @@
-// src/reservation-document/reservation-document.service.ts
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 import * as QRCode from 'qrcode';
 import * as PDFKit from 'pdfkit';
 import { FileUploadResult } from '../../upload/interfaces/upload.interface';
-
+import * as stream from 'stream';
+import * as moment from 'moment';
+import 'moment/locale/fr';
 
 @Injectable()
 export class ReservationDocumentService {
@@ -17,12 +18,20 @@ export class ReservationDocumentService {
   }
 
   async generateAndUploadQRCode(
-    reservationId: number,
-    reservationUrl: string,
-    folder: string = 'reservations/qrcodes',
+    reservation: any,
+    folder = 'reservations/qrcodes',
   ): Promise<FileUploadResult> {
     try {
-      const qrBuffer = await QRCode.toBuffer(reservationUrl, { width: 300 });
+      const jour = moment(reservation.date).locale('fr').format('dddd');
+      const date = moment(reservation.date).locale('fr').format('D MMMM YYYY');
+      const heure = `${reservation.heureDebut} - ${reservation.heureFin}`;
+      const service = reservation.medecinSousService?.sousService?.nom || 'Service';
+      const medecin = reservation.medecinSousService?.medecin?.nom || 'Docteur';
+
+      const qrText = `Clinique Léontine\nService : ${service}\nMédecin : ${medecin}\nDate : ${jour} ${date}\nHeure : ${heure}`;
+
+      const qrBuffer = await QRCode.toBuffer(qrText, { width: 300 });
+
       return new Promise<FileUploadResult>((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           { folder, resource_type: 'image' },
@@ -45,22 +54,67 @@ export class ReservationDocumentService {
 
   async generateAndUploadPDF(
     reservation: any,
-    folder: string = 'reservations/pdfs',
+    folder = 'reservations/pdfs',
   ): Promise<FileUploadResult> {
     try {
-      const doc = new PDFKit();
+      const doc = new PDFKit({ margin: 50 });
       const buffers: Buffer[] = [];
 
       doc.on('data', buffers.push.bind(buffers));
       doc.on('end', () => {});
 
-      doc.fontSize(16).text('Confirmation de Réservation', { align: 'center' });
-      doc.moveDown();
-      doc.fontSize(12).text(`Réservation ID: ${reservation.id}`);
-      doc.text(`Service: ${reservation.medecinSousService?.sousService?.nom || 'N/A'}`);
-      doc.text(`Date: ${new Date(reservation.date).toLocaleDateString()}`);
-      doc.text(`Heure: ${reservation.heureDebut} - ${reservation.heureFin}`);
-      doc.text(`Montant: ${reservation.paiement?.montant || 'N/A'} ${reservation.paiement?.devise || ''}`);
+      const nomMedecin = reservation.medecinSousService?.medecin?.nom || 'Docteur';
+      const service = reservation.medecinSousService?.sousService?.nom || 'Service';
+      const montant = reservation.montant || reservation.paiement?.montant || 0;
+      const devise = reservation.devise || reservation.paiement?.devise || 'F';
+      const date = moment(reservation.date).locale('fr').format('D MMMM YYYY');
+      const jour = moment(reservation.date).locale('fr').format('dddd');
+      const heure = `${reservation.heureDebut} - ${reservation.heureFin}`;
+      const numeroRecu = reservation.id.toString().padStart(4, '0');
+
+      const qrCodeBuffer = await QRCode.toBuffer(
+        `Clinique Léontine\nService : ${service}\nMédecin : ${nomMedecin}\nDate : ${jour} ${date}\nHeure : ${heure}`,
+        { width: 300 },
+      );
+
+      // HEADER
+      doc.fontSize(20).text('Clinique Léontine', { align: 'center' });
+      doc.moveDown(0.5);
+      doc.fontSize(14).text('***************', { align: 'center' });
+      doc.moveDown(0.3);
+      doc.fontSize(14).text(`Reçu N°${numeroRecu}`, { align: 'center' });
+
+      doc.moveDown(1);
+      doc.fontSize(12).text(`Jour :        ${jour}`);
+      doc.text('***************************************');
+
+      doc.text(`Date :        ${date}`);
+      doc.text('***************************************');
+
+      doc.text(`Heure :       ${heure}`);
+      doc.text('***************************************');
+
+      doc.text(`Service :     ${service}`);
+      doc.text('***************************************');
+
+      doc.text(`Médecin :     ${nomMedecin}`);
+      doc.text('***************************************');
+
+      doc.text(`Prix :        ${Number(montant).toLocaleString()}${devise}`);
+      doc.text('***************************************');
+
+      // QR CODE
+      doc.moveDown(1);
+      doc.image(qrCodeBuffer, { align: 'center', fit: [180, 180], valign: 'center' });
+
+      doc.moveDown(1);
+      doc.fontSize(14).text('Remarque :', { align: 'center' });
+      doc.moveDown(0.2);
+      doc.fontSize(10).text(
+        'Veuillez garder ce reçu jusqu’au\njour de votre rendez-vous',
+        { align: 'center' },
+      );
+
       doc.end();
 
       const pdfBuffer = await new Promise<Buffer>((resolve) => {
@@ -80,7 +134,9 @@ export class ReservationDocumentService {
             });
           },
         );
-        uploadStream.end(pdfBuffer);
+        const readableStream = new stream.PassThrough();
+        readableStream.end(pdfBuffer);
+        readableStream.pipe(uploadStream);
       });
     } catch (error) {
       throw new BadRequestException(`Erreur génération PDF: ${error.message}`);

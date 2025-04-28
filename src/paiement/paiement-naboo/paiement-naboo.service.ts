@@ -1,30 +1,31 @@
+// src/paiement/paiement-naboo/paiement-naboo.service.ts
+
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import axios from 'axios';
-import * as dotenv from 'dotenv';
 import { IPaiementResult } from '../paiement.interface';
-
-dotenv.config();
 
 @Injectable()
 export class PaiementNabooService {
   private readonly apiKey = `Bearer ${process.env.NABOO_API_KEY}`;
 
   async createTransaction(params: {
-    montant: number,
-    method: 'WAVE' | 'ORANGE_MONEY' | 'FREE_MONEY',
-    description: string
+    montant: number;
+    method: 'WAVE' | 'ORANGE_MONEY' | 'FREE_MONEY';
+    description: string;
   }): Promise<IPaiementResult> {
     const payload = {
       method_of_payment: [params.method],
-      products: [{
-        name: "Consultation",
-        category: "Santé",
-        amount: Math.floor(params.montant),
-        quantity: 1,
-        description: params.description,
-      }],
-      success_url: `${process.env.API_BASE_URL}/paiement/success`,
-      error_url: `${process.env.API_BASE_URL}/paiement/error`,
+      products: [
+        {
+          name: 'Consultation',
+          category: 'Santé',
+          amount: Math.floor(params.montant),
+          quantity: 1,
+          description: params.description,
+        },
+      ],
+      success_url: 'https://dummy.success.url/paiement/success', // 🔐 HTTPS fake URL
+      error_url: 'https://dummy.error.url/paiement/error',       // 🔐 HTTPS fake URL
       is_escrow: false,
       is_merchant: true,
     };
@@ -33,27 +34,26 @@ export class PaiementNabooService {
       const { data } = await axios.put(
         'https://api.naboopay.com/api/v1/transaction/create-transaction',
         payload,
-        { headers: this.getHeaders() }
+        { headers: this.getHeaders() },
       );
 
       return {
         paiementUrl: data.checkout_url,
         orderId: data.order_id,
         montant: data.amount_to_pay,
-        statut: data.transaction_status
+        statut: data.transaction_status,
       };
     } catch (err) {
       console.error('Erreur Naboo:', err?.response?.data || err.message);
       throw new ConflictException('Erreur création transaction Naboo');
     }
-
   }
 
   async getOneTransaction(orderId: string): Promise<any> {
     try {
       const { data } = await axios.get(
         `https://api.naboopay.com/api/v1/transaction/get-one-transaction?order_id=${orderId}`,
-        { headers: this.getHeaders() }
+        { headers: this.getHeaders() },
       );
       return data;
     } catch {
@@ -67,8 +67,8 @@ export class PaiementNabooService {
         'https://api.naboopay.com/api/v1/transaction/delete-transaction',
         {
           headers: this.getHeaders(),
-          data: { order_id: orderId }
-        }
+          data: { order_id: orderId },
+        },
       );
       return data.message;
     } catch {
@@ -77,20 +77,24 @@ export class PaiementNabooService {
   }
 
   async cashout(params: {
-    full_name: string,
-    phone_number: string,
-    amount: number,
-    method: 'WAVE' | 'ORANGE_MONEY'
+    full_name: string;
+    phone_number: string;
+    amount: number;
+    method: 'WAVE' | 'ORANGE_MONEY';
   }): Promise<any> {
     const url = `https://api.naboopay.com/api/v1/cashout/${params.method.toLowerCase()}`;
     try {
-      const { data } = await axios.post(url, {
-        full_name: params.full_name,
-        phone_number: params.phone_number,
-        amount: params.amount
-      }, {
-        headers: this.getHeaders()
-      });
+      const { data } = await axios.post(
+        url,
+        {
+          full_name: params.full_name,
+          phone_number: params.phone_number,
+          amount: params.amount,
+        },
+        {
+          headers: this.getHeaders(),
+        },
+      );
 
       return data;
     } catch {
@@ -101,8 +105,8 @@ export class PaiementNabooService {
   private getHeaders() {
     return {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': this.apiKey,
+      Accept: 'application/json',
+      Authorization: this.apiKey,
     };
   }
 }

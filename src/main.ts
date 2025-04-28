@@ -1,24 +1,28 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationService } from './validation/validation.service';
+import { RedisService } from './redis/redis.service';
+import { AsyncContextInterceptor } from './async-context/async-context.interceptor';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { AsyncContextInterceptor } from './async-context/async-context.interceptor';
+import { ValidationService } from './validation/validation.service';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {CacheInterceptor as  CustomCacheInterceptor} from './common/interceptor/cache.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Récupération de l'instance de ValidationService
   const validationService = app.get(ValidationService);
   app.useGlobalPipes(validationService);
 
-  // Utilisation d'assets statiques pour la documentation
+  const redisService = app.get(RedisService);
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors(new  CustomCacheInterceptor(reflector, redisService));
+  app.useGlobalInterceptors(new AsyncContextInterceptor());
+
   app.useStaticAssets(join(__dirname, '..', 'documentation'), {
     prefix: '/docs',
   });
 
-  // Configuration Swagger avec Bearer Token
   const config = new DocumentBuilder()
     .setTitle('User Management API')
     .setDescription('API for managing users')
@@ -32,24 +36,19 @@ async function bootstrap() {
         name: 'Authorization',
         in: 'header',
       },
-      'access-token'
+      'access-token',
     )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  // Remplacez le middleware par l'interceptor qui définit le contexte après authentification
-  // main.ts (global interceptor)
-  app.useGlobalInterceptors(new AsyncContextInterceptor());
-
   app.enableCors({
-    origin: '*', // ← pour tests. En prod, remplace par les vraies URLs (ex: ['http://localhost:35859'])
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   });
 
-  await app.listen(process.env.PORT ?? 3000,'0.0.0.0');
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
-
 bootstrap();

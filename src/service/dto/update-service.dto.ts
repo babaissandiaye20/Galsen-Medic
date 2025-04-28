@@ -1,16 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class UpdateServiceDto {
   @ApiProperty({ description: "Libellé du service", example: "Radiologie", required: false })
   @IsOptional()
+  @IsString()
   libelle?: string;
 
-  @ApiProperty({ description: "URL de l'icône mise à jour", example: "https://exemple.com/icon.png", required: false })
-  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  @ApiProperty({
+    description: "URL de l’icône, si déjà hébergée",
+    example: "https://exemple.com/icon.png",
+    required: false,
+  })
   @IsOptional()
-  @IsString()
-  iconUrl?: string;
-
-
+  @IsUrl()
+  iconUrl?: string; // ✅ ici : on attend une URL texte
 }

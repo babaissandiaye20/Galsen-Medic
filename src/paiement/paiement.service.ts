@@ -1,16 +1,23 @@
 // src/paiement/paiement.service.ts
-import { Injectable, ConflictException, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../validation/exception/response/response.service';
 import { CreatePaiementNabooDto } from './dto/create-paiement-naboo.dto';
 import { PaiementNabooService } from './paiement-naboo/paiement-naboo.service';
-
-import * as crypto from 'crypto';
 import { ReservationDocumentService } from '../reservation/reservation-document/reservation-document.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class PaiementService {
-  private readonly webhookSecret = process.env.WEBHOOK_SECRET || 'bba93370af52ecd7a64549a9bf09aa321a2d4dd0';
+  private readonly webhookSecret =
+    process.env.WEBHOOK_SECRET || 'default_webhook_secret';
 
   constructor(
     private prisma: PrismaService,
@@ -26,6 +33,7 @@ export class PaiementService {
         paiement: true,
         medecinSousService: {
           include: {
+            medecin: true,
             sousService: {
               include: {
                 tarifs: {
@@ -43,10 +51,15 @@ export class PaiementService {
     if (!reservation) {
       throw new NotFoundException(this.response.notFound('Réservation introuvable'));
     }
+
     if (reservation.paiement) {
       throw new ConflictException(this.response.conflict('Paiement déjà existant'));
     }
-    if (reservation.idUtilisateur !== currentUser.id && currentUser.privilege?.libelle !== 'Admin') {
+
+    if (
+      reservation.idUtilisateur !== currentUser.id &&
+      currentUser.privilege?.libelle !== 'Admin'
+    ) {
       throw new ForbiddenException(this.response.forbidden('Accès non autorisé à cette réservation'));
     }
 
@@ -79,72 +92,58 @@ export class PaiementService {
       },
     });
 
+    const successUrl =
+      dto.successUrl ||
+      `${process.env.APP_SUCCESS_URL || 'http://localhost:4200/paiement-success'}?orderId=${result.orderId}`;
+
     const qrResult = await this.documentService.generateAndUploadQRCode(
       reservation.id,
-      `${process.env.API_BASE_URL || 'https://votreapi.com'}/reservations/${reservation.id}`,
+      successUrl,
     );
-    const pdfResult = await this.documentService.generateAndUploadPDF(reservation);
 
-    const updatedReservation = await this.prisma.reservation.update({
+    const pdfResult = await this.documentService.generateAndUploadPDF({
+      ...reservation,
+      montant: result.montant,
+      devise: tarif.devise.symbole || tarif.devise.libelle || '',
+    });
+
+    await this.prisma.reservation.update({
       where: { id: reservation.id },
       data: {
         qrCodeUrl: qrResult.url,
         pdfUrl: pdfResult.url,
         etatPaiement: 'PENDING',
       },
-      include: {
-        medecinSousService: { include: { sousService: true } },
-        paiement: true,
-        statutReservation: true,
-      },
     });
+
+    /**
+     * 🔥 Simuler webhook en local/dev automatiquement
+     */
+    if (process.env.NODE_ENV === 'development') {
+      const fakeWebhookBody = {
+        order_id: result.orderId,
+        transaction_status: 'COMPLETED',
+        montant: result.montant,
+      };
+
+      const fakeSignature = crypto
+        .createHmac('sha256', this.webhookSecret)
+        .update(JSON.stringify(fakeWebhookBody))
+        .digest('hex');
+
+      await this.handleNabooWebhook(fakeWebhookBody, fakeSignature);
+    }
 
     return this.response.created(
-      { paiement, reservation: updatedReservation, qrCode: qrResult, pdf: pdfResult },
-      'Transaction initiée, veuillez compléter le paiement',
-    );
-  }
-
-  async annulerTransaction(orderId: string, currentUser: any) {
-    const paiement = await this.prisma.paiement.findFirst({
-      where: { referenceTransaction: orderId },
-      include: { reservation: { include: { statutReservation: true } } },
-    });
-    if (!paiement) {
-      throw new NotFoundException(this.response.notFound('Transaction introuvable'));
-    }
-
-    if (
-      paiement.reservation.idUtilisateur !== currentUser.id &&
-      currentUser.privilege?.libelle !== 'Admin'
-    ) {
-      throw new ForbiddenException(this.response.forbidden('Annulation non autorisée'));
-    }
-
-    const cancelledStatut = await this.prisma.statutReservation.findFirst({
-      where: { libelle: 'CANCELLED' },
-    });
-    if (!cancelledStatut) {
-      throw new NotFoundException(this.response.notFound('Statut CANCELLED introuvable'));
-    }
-
-    const result = await this.naboo.deleteTransaction(orderId);
-
-    await this.prisma.paiement.delete({
-      where: { id: paiement.id, idReservation: paiement.idReservation },
-    });
-
-    await this.prisma.reservation.update({
-      where: { id: paiement.idReservation },
-      data: {
-        idStatutReservation: cancelledStatut.id,
-        etatPaiement: 'CANCELLED',
-        qrCodeUrl: null,
-        pdfUrl: null,
+      {
+        paiement,
+        paiementUrl: result.paiementUrl,
+        redirectUrl: successUrl,
+        qrCode: qrResult,
+        pdf: pdfResult,
       },
-    });
-
-    return this.response.success(result, 'Transaction annulée');
+      'Transaction initiée avec succès',
+    );
   }
 
   async handleNabooWebhook(
@@ -170,7 +169,7 @@ export class PaiementService {
     }
 
     await this.prisma.paiement.update({
-      where: { id: paiement.id, idReservation: paiement.idReservation },
+      where: { id: paiement.id },
       data: { etatTransaction: body.transaction_status },
     });
 
@@ -193,7 +192,7 @@ export class PaiementService {
           etatPaiement: 'PAID',
         },
       });
-    } else if (body.transaction_status === 'FAILED' || body.transaction_status === 'CANCELLED') {
+    } else {
       await this.prisma.reservation.update({
         where: { id: paiement.idReservation },
         data: {
@@ -206,25 +205,5 @@ export class PaiementService {
     }
 
     return this.response.success(null, 'Webhook traité avec succès');
-  }
-
-  async handleSuccess(orderId: string) {
-    const paiement = await this.prisma.paiement.findFirst({
-      where: { referenceTransaction: orderId },
-    });
-    if (!paiement) {
-      throw new NotFoundException(this.response.notFound('Paiement introuvable'));
-    }
-    return this.response.success({ orderId, status: 'success' }, 'Paiement réussi (test)');
-  }
-
-  async handleError(orderId: string) {
-    const paiement = await this.prisma.paiement.findFirst({
-      where: { referenceTransaction: orderId },
-    });
-    if (!paiement) {
-      throw new NotFoundException(this.response.notFound('Paiement introuvable'));
-    }
-    return this.response.success({ orderId, status: 'error' }, 'Paiement échoué (test)');
   }
 }
